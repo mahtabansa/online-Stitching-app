@@ -1,0 +1,23 @@
+import { User } from "../models/usermodel.js";
+
+ const getCurrentUser = async (req, res) => {
+  try {
+ 
+    const userId = req.userId;
+   console.log("userid",userId)
+
+    if (!userId) {
+      return res.status(200).json({ message: "user Is not found" });
+    }
+     const user = await User.findById(userId).select("-password");
+    
+    if (!user) {
+      return res.status(400).json({ message: "user does not exist" });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({ message: `get current user error ${error}` });
+    
+  }
+};
+ export {getCurrentUser}
