@@ -67,14 +67,21 @@ const Navbar = () => {
             }
 
 
-            <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold">
+            <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold" onClick={()=>navigate('/my-orders')}>
               🛒 My Order
             </button>
+            {userData && userData.role==="tailor"?  <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold" onClick={()=>navigate('/create-item')}>
+               Add Item
+            </button>:<button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold" onClick={()=>navigate('/create-item')}>
+               My cart
+            </button>}
+         
           </div>
 
-          <button type='submit' className="md:hidden text-2xl">
-            ☰
-          </button>
+          {/* <button type='submit' className="md:hidden text-2xl" onClick={()=>navigate('/create-item')}>
+            Add Item
+          </button> */}
+
           <Link to='' >
             <button className="ml-5 text-gray-900 py-2 rounded-lg font-semibold" onClick={() => setOpen(true)}
             >
@@ -103,7 +110,7 @@ const Navbar = () => {
 
             {/* Content */}
             <div className="p-4 space-y-3">
-              <p className="cursor-pointer hover:text-blue-600">{userData ? userData.name.toUpperCase() : ''}</p>
+              <p className="cursor-pointer hover:text-blue-600">{userData ? userData?.name?.toUpperCase() :""}</p>
               <p className="cursor-pointer hover:text-blue-600">Settings</p>
               <p className="cursor-pointer text-red-500" onClick={handleLogout}>Logout</p>
             </div>

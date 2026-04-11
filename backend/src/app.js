@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors'
 import { userRouter } from './routes/user.route.js';
 import { shopRouter } from './routes/shop.route.js';
+import { itemRouter } from './routes/item.route.js';
 
 const app = express();
 const port  = process.env.PORT || 8001
@@ -18,9 +19,11 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}));
+
 app.use('/api/auth',authRouter , express.static("public"));
 app.use('/api/user',userRouter);
 app.use('/api/shops',shopRouter);
+app.use('/api/items',itemRouter);
 
 
 app.listen(port,()=> {

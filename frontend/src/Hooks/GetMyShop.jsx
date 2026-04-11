@@ -19,7 +19,7 @@ const GetMyShop = () => {
             console.log("error in fetching my shop", err);
       }
 
-   }, [userData])
+   }, [userData ])
 }
 
 export default GetMyShop

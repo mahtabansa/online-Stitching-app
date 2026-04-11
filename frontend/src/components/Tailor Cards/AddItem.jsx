@@ -23,7 +23,7 @@ const AddItem = () => {
 
                               {/* 🔥 Overlay Button */}
                               <button
-                                    onClick={() => navigate("/create-edit-item")}
+                                    onClick={() => navigate("/create-item")}
                                     className="absolute bottom-3 left-1/2 transform -translate-x-1/2 
                    bg-[#C7843B] text-white px-5 py-2 rounded-full 
                    hover:bg-[#a66a2f] transition duration-200 shadow-lg"

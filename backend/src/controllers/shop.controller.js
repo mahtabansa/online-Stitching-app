@@ -43,7 +43,7 @@ const getMyShop = async (req, res) => {
      const userId = req.userId;
 
     // update existing shop
-    let shop = await Shop.find({ owner: req.userId }).populate("owner");
+    let shop = await Shop.find({ owner: req.userId }).populate("owner items");
 
     if(!shop) {
       return res.status(404).json({ message: "Shop not found" });

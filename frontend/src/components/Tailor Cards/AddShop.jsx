@@ -7,8 +7,6 @@ const AddShop = () => {
       const navigate = useNavigate();
       const { shopsInMyCity } = useSelector((state) => state.user);
 
-      console.log(shopsInMyCity);
-
       return (
             <div className="w-full max-w-md flex justify-center items-center p-4 
                          sm:p-6 bg-white shadow-lg hover:shadow-2xl rounded-md 

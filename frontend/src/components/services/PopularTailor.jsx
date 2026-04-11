@@ -33,7 +33,7 @@ const PopularTailor = () => {
         </div>
 
         {/* Cards Container */}
-        <div className="flex flex-wrap justify-center gap-6">
+        <div className="flex flex-wrap justify-center items-center gap-6">
 
           {
             shopData && shopData?.shop?.map((shop) => (

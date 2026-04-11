@@ -19,7 +19,7 @@ const GetCurrentUser = () => {
           `${serverurl}/api/user/current-user`,
           { withCredentials: true }
         );
-        console.log('result',result);
+        
        dispatch(setUserData(result.data))
       
       } catch (err) {
@@ -31,7 +31,7 @@ const GetCurrentUser = () => {
     };
 
     fetchUser();
-  }, [dispatch]);
+  }, [!userData]);
 
   return loading;
 

@@ -1,6 +1,5 @@
 import React from 'react'
 import { useSelector } from 'react-redux';
-import dummyImage from '../../assets/dummy_pic.jpg';
 
 
 const PopularTailorCard = ({shop}) => {
@@ -35,12 +34,14 @@ const PopularTailorCard = ({shop}) => {
     />
 
     {/* Profile Image (center + overlap) */}
-    <div className="absolute left-1/2 transform -translate-x-1/2 translate-y-1/2 bottom-0" onClick={handleImageChange}>
+    <div className="absolute left-1/2 transform -translate-x-1/2 translate-y-1/2 bottom-0" onClick={()=> {
+      userData?.role === "tailor" && handleImageChange();
+    }}>
       <img
         src={
     shop?.owner?.image
   
-      || "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+      || "https://cdn-icons-png.flaticon.com/512/149/149071.png" 
   }
         className="w-20 h-20 rounded-full border-4 border-white object-cover"
        />

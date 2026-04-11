@@ -13,6 +13,7 @@ const Choose = () => {
     console.log("Selected Role:", role);
     dispatch(setRole(role));
     setShowPopup(false);
+    navigate('/signup')
 
   };
   const handleClose = () => {

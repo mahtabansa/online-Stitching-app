@@ -2,10 +2,13 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
+import Loader from '../pages/Loader.jsx';
+
 const Login = () => {
       const navigate = useNavigate();
-      const [formData, setFormData] = useState({ email: "", password: "" });
+      const [loading, setLoading] = useState(false);
 
+      const [formData, setFormData] = useState({ email: "", password: "" });
       const { email, password } = formData
       const handleChange = (e) => {
             const { name, value } = e.target;
@@ -22,22 +25,25 @@ const Login = () => {
             });
 
       const handlesubmit = async (e) => {
-
+            setLoading(true)
             e.preventDefault();
             try {
-                  const { data } = await axios.post("http://localhost:8000/api/auth/login", 
+                  const { data } = await axios.post("http://localhost:8000/api/auth/login",
                         { ...formData }, { withCredentials: true });
-           
-           navigate("/");
-           setFormData({ email: "", password: "" })
 
-        
-    } catch (err) {
-       
-        handleError(err.response?.data?.message || "Error in login");
-        console.log("error in login controller", err);
-    }
-      } 
+                  setFormData({ email: "", password: "" })
+                  navigate('/')
+                  handleSuccess();
+                  setLoading(false);
+
+            } catch (err) {
+
+                  handleError(err.response?.data?.message || "Error in login");
+                  console.log("error in login controller", err);
+                  setLoading(false);
+                  
+            }
+      }
       return (
             <div className='bg-[#FEFEFE] flex justify-center p-5 m-5'>
 
@@ -56,13 +62,18 @@ const Login = () => {
                         <div className=' px-5 py-3'>
                               <label htmlFor="password">Password</label> <br />
                               <input type='password' placeholder='Enter your password' name='password'
-                                    className='w-80 p-2 border-1 rounded opacity-50' value={password} onChange={handleChange} required/>
+                                    className='w-80 p-2 border-1 rounded opacity-50' value={password} onChange={handleChange} required />
                         </div>
 
                         <div className='py-5'>
                               <div className='flex justify-center pb-4' style={{ width: "100%" }}>
-                                    <button className='bg-blue-600 text-white px-4 py-2 rounded-md 
-                               flex justify-center align-center' type='submit' onClick={handlesubmit}>Login</button>
+                                    {loading ?
+                                          <div className="fixed inset-0 bg-[#FEFEFE] bg-opacity-40 flex justify-center items-center z-50">
+                                                      <Loader/>
+                                          </div>
+                                          :
+                                          <button className='bg-blue-600 text-white px-4 py-2 rounded-md 
+                               flex justify-center align-center' type='submit' onClick={handlesubmit}>Login</button>}
                               </div>
 
                               <div className='  flex justify-center '>
@@ -72,10 +83,11 @@ const Login = () => {
                         </div>
 
                   </form>
-                 <ToastContainer />
+                  <ToastContainer />
 
             </div>
       )
 }
 
 export default Login
+

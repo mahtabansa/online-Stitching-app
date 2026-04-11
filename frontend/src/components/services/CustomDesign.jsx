@@ -2,26 +2,52 @@ import React from 'react'
 import Navbar from '../../Navbar.jsx'
 import { IoMdArrowBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import UserItemCard from './UserItemCard.jsx';
 
 const CustomDesign = () => {
   const navigate = useNavigate();
+  const {ItemsInMyCity} = useSelector((state)=>state.user);
+  console.log("ItemsInMyCity",ItemsInMyCity);
   return (
     <><Navbar />
-      <div className='flex flex-col items-center gap-2 p-5'>
+   <div className='p-5'>
 
-        <div className='text-2xl font-semibold flex flex-row'>
+        <div className='relative flex items-center justify-center py-5'>
 
-          <span className='text-[#B07A5A] px-3 '>
-            <span className='text-gray-800 cursor-pointer ' onClick={()=>navigate(-1)}><IoMdArrowBack />  Top </span> Designs</span>
+          <span
+            className='text-3xl text-gray-900 cursor-pointer'
+            onClick={() => navigate(-1)}
+          >
+            <IoMdArrowBack />
+          </span>
+
+
+          <h1 className='text-3xl px-5 font-semibold'>
+            Popular Tailor
+          </h1>
+
         </div>
 
+        {/* Cards Container */}
+        <div className="flex flex-wrap justify-center items-center gap-6">
 
-        <div>legha kurta</div>
-        <div>suit salwar </div>
-        <div>anar kali</div>
-        <div>uniform</div>
-        <div>festival clothes</div>
-        <div>wedding haldi ceremony</div>
+          {
+            ItemsInMyCity && ItemsInMyCity?.map((shop) => (
+              <UserItemCard key={shop._id} item={shop} />
+            ))
+          }
+
+          {
+            ItemsInMyCity?.length === 0 && (
+              <p className='text-center text-xl opacity-75 py-10 w-full'>
+                No tailor found in your city ,we are working to provide services
+              </p>
+            )
+          }
+
+        </div>
+
       </div>
     </>
   )

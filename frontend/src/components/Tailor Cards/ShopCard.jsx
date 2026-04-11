@@ -1,29 +1,3 @@
-// import React from 'react'
-// import { FaRegEdit } from "react-icons/fa";
-// import { useNavigate } from 'react-router-dom';
-// const ShopCard = ({data}) => {
-//   const navigate = useNavigate();
-
-//   return (
-//     <div className="w-full max-w-3xl flex justify-center items-center p-4 
-//                          bg-white   rounded-md 
-//                          transition-shadow duration-200 relative">
-
-//            <img src={data.image} alt={data.name} className="w-full h-70 object-cover rounded-md" />
-//            <div className="absolute top-7 right-7" onClick={()=>navigate(`/create-edit-shop`)}>
-//              <FaRegEdit className=" text-3xl sm:text-2xl text-gray-800 hover:text-blue-800 cursor-pointer" />
-//            </div>
-//            <p className=" text-2xl font-semibold text-[#16161A] absolute text-center w-full bottom-10 left-0">
-//              {data.name.toUpperCase()}
-//            </p>
-
-//     </div>
-//   )
-// }
-
-// export default ShopCard
-
-
 import React, { useState } from 'react'
 import { FaRegEdit } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
@@ -45,7 +19,7 @@ const ShopCard = ({ data }) => {
 
     if (!file) return;
 
-    // ✅ size validation
+  
     if (file.size > 2 * 1024 * 1024) {
       alert("Image size should be less than 2MB");
       return;
@@ -85,7 +59,8 @@ const ShopCard = ({ data }) => {
     <div className="w-full max-w-3xl bg-white rounded-xl shadow-md overflow-hidden relative">
 
       {/* 🔹 Background Image */}
-      <div className="relative h-56 w-full">
+      
+  {   !userData ? <p>Loading Data....</p> :<div className="relative h-56 w-full">
         <img
           src={data?.image}
           alt={data?.name}
@@ -124,11 +99,11 @@ const ShopCard = ({ data }) => {
 
         </div>
       </div>
-
+}
       {/* 🔹 Content */}
       <div className="pt-15 pb-6 text-center px-4">
         <p className="text-2xl font-semibold text-[#16161A]">
-          {data.name.toUpperCase()}
+          {data?.name?.toUpperCase()}
         </p>
       </div>
 
