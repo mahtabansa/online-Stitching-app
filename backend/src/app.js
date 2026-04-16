@@ -8,6 +8,7 @@ import cors from 'cors'
 import { userRouter } from './routes/user.route.js';
 import { shopRouter } from './routes/shop.route.js';
 import { itemRouter } from './routes/item.route.js';
+import { orderRouter } from './routes/order.route.js';
 
 const app = express();
 const port  = process.env.PORT || 8001
@@ -24,6 +25,7 @@ app.use('/api/auth',authRouter , express.static("public"));
 app.use('/api/user',userRouter);
 app.use('/api/shops',shopRouter);
 app.use('/api/items',itemRouter);
+app.use('/api/order',orderRouter);
 
 
 app.listen(port,()=> {

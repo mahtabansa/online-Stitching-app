@@ -14,6 +14,7 @@ const createEditShop = async (req, res) => {
       updatedData.image = image;
     }
 
+    
     // update existing shop
     let shop = await Shop.findOneAndUpdate({ owner: req.userId }, updatedData, {
       new: true,

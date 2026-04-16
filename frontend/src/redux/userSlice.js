@@ -11,7 +11,12 @@ const userSlice = createSlice({
     shopsInMyCity: null,
     ItemsInMyCity: null,
     ItemCard: [],
+    TotalAmount: 0,
+    Myorder:{
+      orders:[]
+    },
     location: null,
+
   },
   reducers: {
     setUserData: (state, actions) => {
@@ -44,19 +49,48 @@ const userSlice = createSlice({
     },
     setAddToCard: (state, actions) => {
       const newItem = actions.payload;
-
+      state.ItemCard.push(newItem);
       const existingItem = state.ItemCard.find((i) => i._id === newItem._id);
       if (existingItem) {
         existingItem.quantity += newItem.quantity;
       } else {
-        state.CardItem.push(newItem);
+        state.ItemCard.push(newItem);
       }
 
-      state.TotalAmount = state.CardItem.reduce(
+      state.TotalAmount = state.ItemCard.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0,
       );
     },
+
+    updateQuantity: (state, actions) => {
+      const { id, quantity } = actions.payload;
+      const item = state.ItemCard.find((i) => i._id === id);
+      if (item) {
+        item.quantity = quantity;
+      }
+      state.TotalAmount = state.ItemCard.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+    },
+
+    removeItemFromCard: (state, actions) => {
+      const { id } = actions.payload;
+      const updatedcardItems = state.ItemCard.filter((i) => i._id !== id);
+      state.ItemCard = updatedcardItems;
+      state.TotalAmount = state.ItemCard.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+    },
+
+    AddMyOrders:(state,actions)=>{
+      const newItems = actions.payload
+
+      state.Myorder.orders = [newItems,...state.Myorder.orders]
+    }
+
   },
 });
 export const {
@@ -69,6 +103,9 @@ export const {
   setShopsInMyCity,
   setItemsInMyCity,
   setAddToCard,
+  updateQuantity,
+  AddMyOrders,
+  removeItemFromCard,
   ClearUser,
 } = userSlice.actions;
 

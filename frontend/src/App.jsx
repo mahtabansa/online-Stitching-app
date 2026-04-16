@@ -20,15 +20,17 @@ import EditItem from './components/tailor/EditItem.jsx'
 import MyOrders from './components/tailor/MyOrders.jsx'
 import GetItemsInMyCity from './Hooks/GetItemsInmyCity.jsx'
 import MyCart from './components/services/MyCart.jsx'
+import CheckOut from './components/services/CheckOut.jsx'
+import GetMyOrder from './Hooks/GetMyOrder.jsx'
 
 function App() {
-  const {userData ,role} = useSelector((state) => state.user);
-  let userdata ;
-  if(userData !== null){
-      userdata =userData?.role
+  const { userData, role } = useSelector((state) => state.user);
+  let userdata;
+  if (userData !== null) {
+    userdata = userData?.role
   }
-  else if(role !==null){
-    userdata =role
+  else if (role !== null) {
+    userdata = role
   }
 
 
@@ -37,18 +39,18 @@ function App() {
   GetMyShop();
   GetShopInmyCity();
   GetItemsInMyCity();
-
+  GetMyOrder()
   return (
-   <BrowserRouter>
+    <BrowserRouter>
       {/* Popup only when not logged in */}
-{/* 
+      {/* 
       { !role || !userData && <Choose />} */}
 
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={userData? <HomePage/> : <Login />} />
-        <Route path="/signup" element={ <SignUp /> } />
+        <Route path="/login" element={userData ? <HomePage /> : <Login />} />
+        <Route path="/signup" element={<SignUp />} />
         {/* 🔒 Protected Routes */}
         <Route
           path="/popular_tailor"
@@ -77,7 +79,7 @@ function App() {
           }
         />
 
-         <Route
+        <Route
           path="/create-edit-shop"
           element={
             <ProtectedRoute>
@@ -95,7 +97,7 @@ function App() {
           }
         />
 
-        
+
         <Route
           path="/edit-item/:id"
           element={
@@ -105,26 +107,34 @@ function App() {
           }
         />
 
-        <Route path='/my-orders'  
+        <Route path='/my-orders'
           element={
-                <ProtectedRoute>
-                  <MyOrders/>
-              </ProtectedRoute>
+            <ProtectedRoute>
+              <MyOrders />
+            </ProtectedRoute>
           }
-         />
+        />
 
-             <Route path='/my-cart'  
+        <Route path='/my-cart'
           element={
-                <ProtectedRoute>
-                  <MyCart/>
-              </ProtectedRoute>
+            <ProtectedRoute>
+              <MyCart />
+            </ProtectedRoute>
           }
-         />
+        />
 
-       
+
+        <Route path='/checkout'
+          element={
+            <ProtectedRoute>
+              <CheckOut />
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
 
-      
+
     </BrowserRouter>
 
 

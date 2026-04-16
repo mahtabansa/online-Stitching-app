@@ -5,11 +5,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setMyShopData } from '../../redux/ownerSlice.js';
 import {useNavigate} from 'react-router'
 import { IoArrowBack } from "react-icons/io5";
+import { ClipLoader } from "react-spinners";
+
 const CreateItem = () => {
       const { myShopData } = useSelector((state) => state.owner);
-      console.log("myShopData[0]?.owner?._id",myShopData[0]?.owner._id)
+      console.log("myShopData[0]?.owner?._id",myShopData[0]?._id)
+      console.log("myshopData",myShopData)
      const dispatch = useDispatch();
      const navigate = useNavigate();
+      const [loading,setLoading] = useState(false);
       const [FrontendImage, setFrontendImage] = React.useState(null);
       const [preview, setPreview] = useState(null);
       const [name, setName] = React.useState("");
@@ -34,11 +38,12 @@ const CreateItem = () => {
 
       const handleSubmit = async (e) => {
             e.preventDefault();
+            setLoading(true)
             const formData = new FormData();
             formData.append("name", name);
             formData.append("description", description);
             formData.append("price", price);
-            formData.append("shopId",myShopData[0]?.owner._id)
+           
             if (FrontendImage) {
                   formData.append("image", FrontendImage);
             }
@@ -49,6 +54,7 @@ const CreateItem = () => {
                   const response = await axios.post(`${url}/api/items/create-item`, formData, { withCredentials: true })
 
                   console.log("response", response.data)
+                   setLoading(false);
                   dispatch(setMyShopData(response.data))
                   navigate('/')
             } catch (err) {
@@ -120,7 +126,7 @@ const CreateItem = () => {
                               <div className='py-2'>
                                     <div className='flex justify-center pb-4' style={{ width: "100%" }}>
                                           <button type='submit' className='bg-blue-600 text-white px-4 py-2 rounded-md 
-               flex justify-center align-center' onClick={handleSubmit}>Add Item</button>
+               flex justify-center align-center' onClick={handleSubmit} >{loading? <ClipLoader className=' w-full text-blue-600'/>:"Add Item" }</button>
                                     </div>
 
                               </div>

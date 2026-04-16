@@ -8,7 +8,7 @@ import UserItemCard from './UserItemCard.jsx';
 const CustomDesign = () => {
   const navigate = useNavigate();
   const {ItemsInMyCity} = useSelector((state)=>state.user);
-  console.log("ItemsInMyCity",ItemsInMyCity);
+
   return (
     <><Navbar />
    <div className='p-5'>
@@ -17,14 +17,14 @@ const CustomDesign = () => {
 
           <span
             className='text-3xl text-gray-900 cursor-pointer'
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
           >
             <IoMdArrowBack />
           </span>
 
 
           <h1 className='text-3xl px-5 font-semibold'>
-            Popular Tailor
+             Trending & New  Design 
           </h1>
 
         </div>

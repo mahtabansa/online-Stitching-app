@@ -4,23 +4,21 @@ import uploadOnCloudinary from "../utils/Cloudinary.js";
 
 export const createItem = async (req, res) => {
   try {
-    const { name, price, description, shopId } = req.body;
+    const { name, price, description } = req.body;
 
-    console.log("name, price, description, shopId",name, price, description, shopId)
-    if (!name || !price || !description || !shopId) {
-
+    console.log("name, price, description, shopId", name, price, description);
+    if (!name || !price || !description) {
       return res
         .status(400)
         .json({ message: "Please provide all required fields" });
     }
 
-    const updatedData = {
-      name,
-      price,
-      description,
-      shop: shopId,
-      user: req.userId,
-    };
+    const shop = await Shop.findOne({ owner: req.userId }).populate("items");
+    console.log("shop", shop);
+    if (!shop) {
+      return res.status(404).json({ message: "Shop not found" });
+    }
+    const updatedData = { name, price, description, shop: shop._id };
 
     let image;
 
@@ -31,14 +29,8 @@ export const createItem = async (req, res) => {
       updatedData.image = uploadedImage;
     }
 
-    const shop = await Shop.findOne({ owner: shopId }).populate("items");
-    console.log("shop", shop);
-    if (!shop) {
-      return res.status(404).json({ message: "Shop not found" });
-    }
-
     const newItem = await Item.create(updatedData);
-    console.log("newItem",newItem)
+    console.log("newItem", newItem);
     shop.items.push(newItem._id);
     await shop.save();
     await shop.populate({
@@ -160,7 +152,7 @@ const getItemInmyCity = async (req, res) => {
     const { city } = req.params;
 
     const shops = await Shop.find({
-      city: { $regex: `^${city}$`, $options: 'i' },
+      city: { $regex: `^${city}$`, $options: "i" },
     }).populate("items");
 
     if (shops.length === 0) {
@@ -168,17 +160,16 @@ const getItemInmyCity = async (req, res) => {
     }
 
     // saare items ek array me nikaal lo
-    const items = shops.flatMap(shop => shop.items);
+    const items = shops.flatMap((shop) => shop.items);
 
     if (items.length === 0) {
       return res.status(404).json({ message: "item not found in your city" });
     }
 
     return res.status(200).json(items);
-
   } catch (err) {
     return res.status(500).json({ message: "error occured" });
   }
 };
 
-export {getItemInmyCity}
+export { getItemInmyCity };

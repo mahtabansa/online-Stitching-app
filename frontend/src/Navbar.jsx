@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUserData } from './redux/userSlice.js';
 const serverurl = import.meta.env.VITE_SERVER_URL;
 const Navbar = () => {
-  const { userData, currentCity, currentState } = useSelector((state) => state.user);
+  const { userData, currentCity, currentState, ItemCard } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
@@ -33,7 +33,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4" >
-        <div className={`flex items-center h-16 ${userData?.role === "tailor" ? "justify-center gap-5":"justify-between"} `} >
+        <div className={`flex items-center h-16 ${userData?.role === "tailor" ? "justify-center gap-5" : "justify-between"} `} >
 
           <div className="flex items-center gap-4">
 
@@ -61,21 +61,28 @@ const Navbar = () => {
 
             </div>
           )}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4 relative">
             {
-              userData ? <button className="font-medium" onClick={handleLogout} > {userData.role && userData.role==="tailor" ? "" : "log out"}</button> : <button className="font-medium" style={{ display: checkToken() ? 'none' : 'block' }} onClick={() => navigate('/login')}>Login</button>
+              userData ? <button className="font-medium" onClick={handleLogout} > {userData.role && userData.role === "tailor" ? "" : "log out"}</button> : <button className="font-medium" style={{ display: checkToken() ? 'none' : 'block' }} onClick={() => navigate('/login')}>Login</button>
             }
 
 
-            <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold" onClick={()=>navigate('/my-orders')}>
+            <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold" onClick={() => navigate('/my-orders')}>
               🛒 My Order
             </button>
-            {userData && userData.role==="tailor"?  <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold" onClick={()=>navigate('/create-item')}>
-               Add Item
-            </button>:<button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold" onClick={()=>navigate('/create-item')}>
-               My cart
-            </button>}
-         
+            {userData && userData.role === "tailor" ? <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold" onClick={() => navigate('/create-item')}>
+              Add Item
+            </button> : <div className='relaitve flex justify-center items-center align-items' >
+              <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold" onClick={() => navigate('/my-cart')}>
+                My cart
+
+              </button>
+              <button className=''>
+                <span className='bg-[#baccbf] rounded-xl absolute w-[20px] h-[20px] text-black -top-2 -right-1 items-center '>{ItemCard?.length}</span>
+              </button>
+
+            </div>}
+
           </div>
 
           {/* <button type='submit' className="md:hidden text-2xl" onClick={()=>navigate('/create-item')}>
@@ -110,7 +117,7 @@ const Navbar = () => {
 
             {/* Content */}
             <div className="p-4 space-y-3">
-              <p className="cursor-pointer hover:text-blue-600">{userData ? userData?.name?.toUpperCase() :""}</p>
+              <p className="cursor-pointer hover:text-blue-600">{userData ? userData?.name?.toUpperCase() : ""}</p>
               <p className="cursor-pointer hover:text-blue-600">Settings</p>
               <p className="cursor-pointer text-red-500" onClick={handleLogout}>Logout</p>
             </div>
