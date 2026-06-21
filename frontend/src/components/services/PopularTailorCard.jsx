@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux';
 import UserItemCard from './UserItemCard';
-import UserScrollCard from './userScrollCard';
+import UserScrollCard from './UserScrollCard';
 
 
 const PopularTailorCard = ({ shop }) => {
