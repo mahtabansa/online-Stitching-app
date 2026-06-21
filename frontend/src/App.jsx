@@ -17,12 +17,12 @@ import CreateItem from './components/tailor/CreateItem.jsx'
 import GetShopInmyCity from './Hooks/GetShopInmyCity.jsx'
 import GetMyShop from './Hooks/GetMyShop.jsx'
 import EditItem from './components/tailor/EditItem.jsx'
-import MyOrders from './components/tailor/MyOrders.jsx'
+import MyOrdersHome from './components/tailor/MyOrdersHome.jsx'
 import GetItemsInMyCity from './Hooks/GetItemsInmyCity.jsx'
 import MyCart from './components/services/MyCart.jsx'
 import CheckOut from './components/services/CheckOut.jsx'
 import GetMyOrder from './Hooks/GetMyOrder.jsx'
-
+import TrackOrder from './components/services/TrackOrder.jsx'
 function App() {
   const { userData, role } = useSelector((state) => state.user);
   let userdata;
@@ -32,7 +32,6 @@ function App() {
   else if (role !== null) {
     userdata = role
   }
-
 
   GetCurrentUser();
   GetCurrentLocation();
@@ -110,7 +109,7 @@ function App() {
         <Route path='/my-orders'
           element={
             <ProtectedRoute>
-              <MyOrders />
+              <MyOrdersHome />
             </ProtectedRoute>
           }
         />
@@ -128,6 +127,13 @@ function App() {
           element={
             <ProtectedRoute>
               <CheckOut />
+            </ProtectedRoute>
+          }
+        />
+        <Route path='/track-order/:id'
+          element={
+            <ProtectedRoute>
+              <TrackOrder />
             </ProtectedRoute>
           }
         />

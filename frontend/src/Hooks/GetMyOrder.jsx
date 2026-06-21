@@ -8,7 +8,7 @@ const GetMyOrder = () => {
       const url = import.meta.env.VITE_SERVER_URL
       const dispatch = useDispatch();
       const { userData } = useSelector((state) => state.user)
-
+      
       useEffect(() => {
             if(!userData) return 
             try {
@@ -23,8 +23,6 @@ const GetMyOrder = () => {
                   console.log("err while getting my orders",err)
             }
          
-
-
       }, [userData])
 }
 

@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { createToken } from "../utils/token.js";
 import uploadOnCloudinary from "../utils/Cloudinary.js";
 
+
 export const signup = async (req, res, next) => {
   const { name, phone, email, password, role } = req.body;
   console.log("name, phone,email,password", name, phone, email, password, role);
@@ -76,7 +77,19 @@ export const login = async (req, res, next) => {
       path: "/",
       maxAge: 3 * 24 * 60 * 60 * 1000,
     });
-    res.send("user login successfully");
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token: token,
+      user: {
+        name:user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+        image: user.image,
+      },
+    });
+
     next();
   } catch (err) {
     console.log("error occurs during login", err);

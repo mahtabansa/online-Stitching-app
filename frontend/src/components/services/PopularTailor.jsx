@@ -27,13 +27,13 @@ const PopularTailor = () => {
 
 
           <h1 className='text-3xl px-5 font-semibold'>
-            Popular Tailor
+           Stitch with your Favourite tailor
           </h1>
 
         </div>
 
         {/* Cards Container */}
-        <div className="flex flex-wrap justify-center items-center gap-6">
+        <div className="flex flex-col justify-center items-center gap-6">
 
           {
             shopData && shopData?.shop?.map((shop) => (

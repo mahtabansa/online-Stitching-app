@@ -3,8 +3,11 @@ import React, { useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import Loader from '../pages/Loader.jsx';
+import { setUserData } from '../redux/userSlice.js';
+import { useDispatch } from 'react-redux';
 
 const Login = () => {
+      const dispatch = useDispatch();
       const navigate = useNavigate();
       const [loading, setLoading] = useState(false);
 
@@ -28,10 +31,14 @@ const Login = () => {
             setLoading(true)
             e.preventDefault();
             try {
-                  const { data } = await axios.post("http://localhost:8000/api/auth/login",
+                  const data = await axios.post("http://localhost:8000/api/auth/login",
                         { ...formData }, { withCredentials: true });
 
-                  setFormData({ email: "", password: "" })
+                        console.log("login response", data);
+                        
+                        dispatch(setUserData(data.data.user));
+                      setFormData({ email: "", password: "" })
+                  
                   navigate('/')
                   handleSuccess();
                   setLoading(false);

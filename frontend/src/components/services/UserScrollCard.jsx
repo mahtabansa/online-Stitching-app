@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { setAddToCard } from '../../redux/userSlice.js'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-const UserItemCard = ({ item }) => {
+const UserScrollCard = ({ item }) => {
    const [quantity,setQuantity] = useState(1);
   const dispatch = useDispatch()
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const UserItemCard = ({ item }) => {
   return (
 
 
-    <div className="w-[260px] h-90 bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden cursor-pointer">
+    <div className="w-[260px] h-80 bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden cursor-pointer">
 
       {/* Image */}
       <div className="h-[50%] bg-gray-200 flex items-center justify-center overflow-hidden">
@@ -44,14 +44,12 @@ const UserItemCard = ({ item }) => {
       <div className="p-4 space-y-2">
 
         {/* Title */}
-        <h2 className="text-sm font-semibold text-gray-800 line-clamp-2">
-          <span className='text-medium font-semibold  '>Design</span>, {item?.name}
-        </h2>
+        <div className=" font-semibold text-gray-800 line-clamp-2 relative">
+          <span className='text-lg font-semibold  '>{item?.name}</span> 
+           <span className='absolute text-lg  font-semibold inset-y-0 right-0 '> ₹{item?.price}</span>
+        </div>
 
-        {/* Price */}
-        <p className="text-gray-800">
-          <span className='text-medium font-semibold  '>Price ,</span> ₹{item?.price}
-        </p>
+     
 
         {/* Description */}
         <p className="text-xs text-gray-500 line-clamp-2">
@@ -77,4 +75,4 @@ const UserItemCard = ({ item }) => {
 
 }
 
-export default UserItemCard
+export default UserScrollCard

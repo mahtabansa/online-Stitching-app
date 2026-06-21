@@ -18,6 +18,7 @@ const GetItemsInMyCity = () => {
       try { 
             const fetchMyShop = async () => {
             const response = await axios.get(`${url}/api/items/get-items-incity/${currentCity}`, { withCredentials: true });
+           
             dispatch(setItemsInMyCity(response.data));
           };
           fetchMyShop();

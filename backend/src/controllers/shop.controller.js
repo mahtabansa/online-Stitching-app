@@ -69,7 +69,7 @@ const getShopsInMyCity = async (req, res) => {
    
     const shop = await Shop.find({
       city: { $regex: `^${city}$`, $options: "i" },
-    }).populate("owner");
+    }).populate("owner", "name image phone email ").populate("items");
 
     if (!shop) {
       return res.status(400).json({ message: "shop not found" });

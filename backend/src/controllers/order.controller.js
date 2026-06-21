@@ -194,14 +194,14 @@ const getMyOrders = async (req, res) => {
       const orders = await Order.find({ user: userid })
         .sort({ createdAt: -1 })
         .populate("shopOrder.shop", "name image ")
-        .populate("shopOrder.owner", "name email mobile")
+        .populate("shopOrder.owner", "name email phone image")
         .populate("shopOrder.shopOrderItems.item", "name image description price ");
 
       return res.status(200).json({ orders });
     } else if (user.role === "tailor") {
       const orders = await Order.find({ "shopOrder.owner": userid })
         .sort({ createdAt: -1 })
-        .populate("shopOrder.shop", "name image")
+        .populate("shopOrder.shop", "name image phone")
         .populate("user")
         .populate("shopOrder.shopOrderItems.item", "name image price")
         // .populate("shopOrder.assignedDeliveryBoy", "fullName mobile email");

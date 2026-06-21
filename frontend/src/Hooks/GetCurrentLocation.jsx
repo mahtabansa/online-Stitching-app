@@ -11,7 +11,7 @@ const GetCurrentLocation = () => {
       const dispatch = useDispatch();
 
       useEffect(() => {
-           
+
             if (!userData) return;
             if (navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition(async (position) => {
@@ -24,11 +24,10 @@ const GetCurrentLocation = () => {
                         const longitude = position.coords.longitude;
 
                         const response = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&type=postcode&format=json&apiKey=${apikey}`);
-
-                        const result = response.data.results[0].
-                              city_district
-                              || response.data.results[0].city;
-                    
+                       
+                        const result =response.data.results[0].city ? response.data.results[0].city : response.data.results[0].county;
+                        
+                        console.log("result",result);
                         const fullAddress = response.data.results[0].address_line2 + " " + response.data.results[0].address_line1 + " " + " " + response.data.results[0].state + " " + response.data.results[0].country
                         dispatch(setCurrentCity(result));
                         dispatch(setCurrentAddress(fullAddress));
