@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { CiSearch } from "react-icons/ci";
 import { Link, useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from "react-toastify";
+import custom_design from '../../media/custom_design.png'
+import popularTailor from '../../media/popularTailor.png'
 const Home = () => {
   const navigate = useNavigate();
   const [username,setUsername] = useState();
@@ -17,14 +19,14 @@ const Home = () => {
         <div className='rounded-lg shadow-xl' style={{ width: "80%" }}>
           <Link to='/custom_design'>
 
-            <img src="media\custom_design.png" alt="custom design"
+            <img src={custom_design} alt="custom design"
               className=' rounded-lg ' />
           </Link>
         </div>
 
         <div className='rounded-lg shadow-xl ' style={{ width: "80%" }}>
           <Link to='/popular_tailor'>
-            <img src="media\popularTailor.png" alt="custom design"
+            <img src={popularTailor} alt="popular tailor"
               className=' rounded-lg' />
           </Link>
         </div>
