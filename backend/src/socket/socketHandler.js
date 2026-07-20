@@ -12,7 +12,7 @@ export function initSocket(server) {
 
   io = new Server(server, {
     cors: {
-      origin: "https://online-stitching-app.onrender.com",
+      origin:"https://online-stitching-app-backend.onrender.com",
       credentials: true,
     },
   });
