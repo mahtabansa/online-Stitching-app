@@ -32,7 +32,7 @@ export const Login = () => {
             e.preventDefault();
            
             try {
-                  const data = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/auth/login`,
+                  const data = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
                         { ...formData }, { withCredentials: true });
                       
                         dispatch(setUserData(data.data.user));
