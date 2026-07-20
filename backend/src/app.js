@@ -22,7 +22,7 @@ const port = process.env.PORT || 8001;
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://online-stitching-app.onrender.com",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),
