@@ -10,6 +10,6 @@ shopRouter.post("/create-edit-shop",authentication ,upload.single("image"),creat
 
 shopRouter.get("/my-shop",authentication ,getMyShop);
 
-shopRouter.get("/shops-in-my-city/:city",authentication ,getShopsInMyCity);
+shopRouter.get("/shops-in-my-city/:city" ,getShopsInMyCity);
 
 export {shopRouter}

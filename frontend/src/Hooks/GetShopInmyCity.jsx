@@ -4,12 +4,14 @@ import { useSelector ,useDispatch} from 'react-redux';
 import { setShopsInMyCity } from '../redux/userSlice.js';     
 const GetShopInmyCity = () => {
       const city = useSelector((state) => state.user.currentCity);
+      const userData = useSelector((state) => state.user.userData);
       const dispatch = useDispatch();
  useEffect(() => {
-          if(!city ) return;
+          if(!city || userData?.role === "tailor" ) return;
             const fetchShopsInMyCity = async () => {
             try {
-                  const response = await axios.get(`http://localhost:8000/api/shops/shops-in-my-city/${city}`, { withCredentials: true });
+                  const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/shops/shops-in-my-city/${city}`, { withCredentials: false });
+                  console.log("response",response)
                   dispatch(setShopsInMyCity(response.data));
             } catch (err) {
                   console.log("error in fetching shops in my city", err);

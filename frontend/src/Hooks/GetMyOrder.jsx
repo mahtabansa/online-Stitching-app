@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
-import { AddMyOrders } from '../redux/userSlice.js'
+import { AddMyOrders, SetMyOrders } from '../redux/userSlice.js'
 const GetMyOrder = () => {
       const url = import.meta.env.VITE_SERVER_URL
       const dispatch = useDispatch();
@@ -14,8 +14,7 @@ const GetMyOrder = () => {
             try {
                   const fetchOrders = async () => {
                         const result = await axios.get(`${url}/api/order/get-my-orders`, { withCredentials: true });
-                        
-                        dispatch(AddMyOrders(result.data.orders))
+                        dispatch(SetMyOrders(result.data.orders))
                   }
                       fetchOrders();
                  

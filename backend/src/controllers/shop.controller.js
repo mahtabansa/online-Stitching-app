@@ -1,52 +1,64 @@
-import {Shop} from "../models/shop.model.js";
+import { Shop } from "../models/shop.model.js";
 import UploadOnCloudinary from "../utils/Cloudinary.js";
-
+import { getIO } from "../socket/socketHandler.js";
+import { User } from "../models/usermodel.js";
 const createEditShop = async (req, res) => {
   try {
     const { name, state, city, address } = req.body;
-
     const updatedData = { name, state, city, address };
 
-    let image;
+    if (!name) return res.status(422).json({ message: `shop name is required` });
+    if (!state) return res.status(422).json({ message: `state is required` });
+    if (!city) return res.status(422).json({ message: `city is required` });
+    if (!address) return res.status(422).json({ message: `address is required` });
 
     if (req.file) {
-      image = await UploadOnCloudinary(req.file.path);
-      updatedData.image = image;
+      updatedData.image = await UploadOnCloudinary(req.file.path);
+    } else {
+      return res.status(422).json({ message: `shop image is required` });
     }
 
-    
-    // update existing shop
     let shop = await Shop.findOneAndUpdate({ owner: req.userId }, updatedData, {
       new: true,
-    });
+    }).populate("owner items");
 
-    // If not exist → create
     if (!shop) {
-      shop = await Shop.create({
-        ...updatedData,
-        owner: req.userId,
-      });
+      shop = await Shop.create({ ...updatedData, owner: req.userId });
     }
 
-    res.json(shop);
+    const updatedUser = await User.findByIdAndUpdate(
+      req.userId,
+      { isShopCreated: true },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    getIO().to(`owner_${shop.owner}`).emit("createEditShop", {
+      shopId: shop._id,
+      shop: shop,
+      isShopCreated: updatedUser.isShopCreated,
+    });
+
+    return res.json(shop);
   } catch (err) {
     console.log("ERROR:", err);
-    res.status(500).send(err.message);
+    return res.status(500).json({ message: err.message });
   }
 };
 
 export { createEditShop };
 
-
 const getMyShop = async (req, res) => {
   try {
-  
-     const userId = req.userId;
+    const userId = req.userId;
 
     // update existing shop
     let shop = await Shop.find({ owner: req.userId }).populate("owner items");
 
-    if(!shop) {
+    if (!shop) {
       return res.status(404).json({ message: "Shop not found" });
     }
 
@@ -59,24 +71,20 @@ const getMyShop = async (req, res) => {
 
 export { getMyShop };
 
-
-
-
-
 const getShopsInMyCity = async (req, res) => {
   try {
     let { city } = req.params;
-   
+
     const shop = await Shop.find({
       city: { $regex: `^${city}$`, $options: "i" },
-    }).populate("owner", "name image phone email ").populate("items");
-
+    })
+      .populate("owner", "name image phone email ")
+      .populate("items");
+    //  console.log("shop ",shop)
     if (!shop) {
       return res.status(400).json({ message: "shop not found" });
     }
-    return res.status(200).json({shop
-
-    });
+    return res.status(200).json({ shop });
   } catch (err) {
     return res
       .status(500)
@@ -85,4 +93,3 @@ const getShopsInMyCity = async (req, res) => {
 };
 
 export { getShopsInMyCity };
-

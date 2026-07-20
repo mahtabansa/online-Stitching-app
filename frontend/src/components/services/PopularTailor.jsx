@@ -1,4 +1,4 @@
-import React, { use } from 'react'
+import React, { use, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../Navbar.jsx'
 import { IoMdArrowBack } from "react-icons/io";
@@ -8,12 +8,10 @@ import PopularTailorCard from './PopularTailorCard.jsx';
 const PopularTailor = () => {
   const navigate = useNavigate();
   const shopData = useSelector((state) => state.user.shopsInMyCity) || [];
-  console.log("shopData", shopData);
+  const [selectedImage,setSelectedImage]=useState(null)
 
   return (
     <>
-      <Navbar />
-
       <div className='p-5'>
 
         <div className='relative flex items-center justify-center py-5'>
@@ -25,8 +23,7 @@ const PopularTailor = () => {
             <IoMdArrowBack />
           </span>
 
-
-          <h1 className='text-3xl px-5 font-semibold'>
+          <h1 className='text-xl md:text-3xl lg:text-3xl pl-5 font-semibold'>
            Stitch with your Favourite tailor
           </h1>
 
@@ -40,7 +37,7 @@ const PopularTailor = () => {
               <PopularTailorCard key={shop._id} shop={shop} />
             ))
           }
-
+         
           {
             shopData.length === 0 && (
               <p className='text-center text-xl opacity-75 py-10 w-full'>

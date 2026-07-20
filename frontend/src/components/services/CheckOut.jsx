@@ -13,9 +13,10 @@ import { BsBoxSeam } from "react-icons/bs";
 import 'leaflet/dist/leaflet.css';
 import Navbar from '../../Navbar.jsx';
 import { setLocation, setAddress } from '../../redux/mapSlice.js';
-import { setCurrentLocation,AddMyOrders } from '../../redux/userSlice.js';
+import { setCurrentLocation, AddMyOrders } from '../../redux/userSlice.js';
 import { FaScissors } from "react-icons/fa6";
 import ChekOutItemCard from '../Tailor Cards/ChekOutItemCard.jsx';
+import { setCheckOut, ClearUser,clearCheckOut } from '../../redux/userSlice.js';
 
 
 function RecenterMap({ location }) {
@@ -29,10 +30,11 @@ const CheckOut = () => {
       const navigate = useNavigate();
       const dispatch = useDispatch();
       const { address } = useSelector(state => state.map);
-      const { TotalAmount, ItemCard, Myorder, userData, location } = useSelector(state => state.user);
+      const { TotalAmount, CheckOutItem, Myorder, userData, location, currentAddress } = useSelector(state => state.user);
+
 
       const apikey = import.meta.env.VITE_GEOCODING_APIKEY;
-      const [addressInput, setAddressInput] = useState(address || null);
+      const [addressInput, setAddressInput] = useState(address || currentAddress || "");
       const [StitchingMethod, setStitchingMethod] = useState("tailor");
       const url = import.meta.env.VITE_SERVER_URL;
 
@@ -58,7 +60,6 @@ const CheckOut = () => {
 
       const getaddressByLatLog = async (lat, lon) => {
             try {
-
                   const response = await axios.get(
                         `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&type=postcode&format=json&apiKey=${apikey}`
                   );
@@ -74,9 +75,10 @@ const CheckOut = () => {
                   const fullAddress = `
             ${addressData.address_line2}
             ${addressData.address_line1}
-          `.trim();
+          `;
+                  console.log("fullAddress", fullAddress)
 
-                  dispatch(setAddress(fullAddress));
+                  setAddressInput(fullAddress);
 
             }
             catch (error) {
@@ -104,9 +106,16 @@ const CheckOut = () => {
       }
 
 
+      const handleBack = () => {
+            dispatch(clearCheckOut(null))
+            navigate("/")
+
+      }
       const handlePlaceOrder = async () => {
+
+            console.log("checkoutItem", CheckOutItem)
             await axios.post(`${url}/api/order/place-order`, {
-                  ItemCard,
+                  CheckOutItem,
                   totalAmount: TotalAmount + deliveryfees,
                   deliveryAddress: addressInput,
                   loggitude: location.loggitude,
@@ -116,15 +125,15 @@ const CheckOut = () => {
             }, { withCredentials: true })
                   .then(res => {
                         console.log("Order placed successfully:", res);
-                      
+
                         // console.log("data", data);
                         // console.log("res.data.order", updatesOrder);
                         // if (paymentMethod === "cod") {
-
-                              dispatch(AddMyOrders(res?.data?.order));
-                              navigate('/')
-
-                          
+                        console.log("Order", res.data.order);
+                        console.log("Dispatching:", res.data.order._id);
+                        console.log("Is Array?", Array.isArray(res.data.order));
+                        dispatch(AddMyOrders(res?.data?.order));
+                        navigate('/my-orders')
 
                         // } else {
                         //       console.log("const orderId = res.data.order.orderId:", res.data.orderId);
@@ -142,12 +151,12 @@ const CheckOut = () => {
 
       return (
             <>
-                  <Navbar />
+
 
                   <div className='min-h-screen bg-[#fff9f6] flex items-center justify-center relative '>
 
                         <div className='flex absolute top-5 left-5 '>
-                              <div className='z-10 ' onClick={() => navigate(-1)}>
+                              <div className='z-10 ' onClick={handleBack}>
                                     <IoArrowBack size={35} className='text-gray-800 cursor-pointer' />
                               </div>
                         </div>
@@ -158,18 +167,18 @@ const CheckOut = () => {
                                     <h2 className='flex items-center text-xl gap-2 m-4 font-bold'><CiLocationOn className='text-blue-700  text-2xl' />Pickup & Delivery Location</h2>
 
                                     <div className='gap-4 flex items-center m-4'>
-                                          <input type="text" className='w-full rounded-md p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff4d2d]' placeholder='Enter your pickup & delivery address..' value={addressInput} onChange={(e) => setAddressInput(e.target.value)} required/>
+                                          <input type="text" className='w-full rounded-md p-2 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400' placeholder='Enter your pickup & delivery address..' value={addressInput} onChange={(e) => setAddressInput(e.target.value)} required />
                                           <button className='bg-[#ff4d2d] text-white px-4 py-2 rounded-md hover:bg-[#ff4d2d]/90' onClick={getlatlogByAddress}>
                                                 <IoSearchOutline size={20} />
                                           </button>
-
+                                          {/* this is for current location icon */}
                                           <button className='bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer' onClick={getCurrentLocation}>
                                                 <BiCurrentLocation onClick={getCurrentLocation} size={20} />
                                           </button>
                                     </div>
                               </section>
 
-                              <div className='rounded-lg bg-gray-100 p-4 m-4  '>
+                              <div className='sticky rounded-lg bg-gray-100 p-4 m-4  '>
                                     <div className='h-60 w-full '>
 
                                           <MapContainer center={[location.lat || 51.505, location.log || -0.09]} zoom={13} scrollWheelZoom={true} className="h-full w-full rounded-lg map-container">
@@ -179,7 +188,7 @@ const CheckOut = () => {
                                                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                                 />
                                                 <RecenterMap location={location} />
-                                                <Marker position={[location.latitude || 51.505, location.longitude || -0.09]} draggable={true} eventHandlers={{ dragend: ondragend }}>
+                                                <Marker position={[location.latitude, location.longitude]} draggable={true} eventHandlers={{ dragend: ondragend }}>
                                                       <Popup >
                                                             Give exact location for. <br /> fastest delivery
                                                       </Popup>
@@ -214,10 +223,9 @@ const CheckOut = () => {
 
 
                                                 <div className='flex flex-col pb-1'>
-                                                      <h1 className='text-gray-700 text-lg font-medium'>Send Clothes and Same Sample </h1>
+                                                      <h1 className='text-gray-700 text-lg font-medium'>Send Clothes and Measurement </h1>
                                                       <h1 className='text-gray-500 text-sm'>After Booked you can send percel to the tailor
                                                       </h1>
-
                                                 </div>
                                           </div>
 
@@ -231,7 +239,7 @@ const CheckOut = () => {
 
 
                                           <div className=''>
-                                                {ItemCard?.map((item, idx) => (
+                                                {CheckOutItem?.map((item, idx) => (
                                                       <div key={idx} className='flex justify-between'>
 
                                                             <ChekOutItemCard item={item} key={item._id} />

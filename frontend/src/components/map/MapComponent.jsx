@@ -14,7 +14,7 @@ const MapComponent = () => {
 
       // call backend
       const res = await axios.get(
-        `http://localhost:8000/get-address?lat=${lat}&lng=${lng}`
+        `${import.meta.env.VITE_SERVER_URL}/get-address?lat=${lat}&lng=${lng}`
       );
 
       const addr = res.data.results?.[0]?.formatted_address;

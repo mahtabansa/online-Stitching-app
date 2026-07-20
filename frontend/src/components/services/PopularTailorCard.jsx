@@ -2,16 +2,14 @@ import React from 'react'
 import { useSelector } from 'react-redux';
 import UserItemCard from './UserItemCard';
 import UserScrollCard from './UserScrollCard';
-
+import { IoMdClose } from "react-icons/io";
 
 const PopularTailorCard = ({ shop }) => {
   const userData = useSelector((state) => state.user.userData);
-  console.log("shop in tailor card", shop);
-  console.log("userData", userData);
   const url = import.meta.env.VITE_SERVER_URL;
-
   const [fontendImage, setFrontendImage] = React.useState("");
   const [backendImage, setBackendImage] = React.useState("");
+  const [selectedImage,setSelectedImage] = React.useState(null);
 
   const profileImage = fontendImage || backendImage;
 
@@ -27,13 +25,13 @@ const PopularTailorCard = ({ shop }) => {
   };
   return (
 
-    <div className=' sm:w-full lg:w-1/2  md:w-full items-center border-b-2 border-gray-200 bg-gray-100 rounded-lg p-5 shadow-md'>
-      <h1 className='pb-2 text-2xl font-semibold'> Boutique,<span className='font-semibold'> {shop?.name}</span></h1>
+    <div className='m-5 sm:w-full lg:w-1/2  md:w-full items-center border-b-2 border-gray-200 bg-gray-100 rounded-lg px-5  shadow-md'>
+      <h1 className='py-5 text-2xl font-semibold'> Boutique,<span className='font-semibold'> {shop?.name}</span></h1>
     
-      <div className="w-80 bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="w-80 bg-white rounded-xl shadow-md overflow-hidden mb-2">
 
         {/* Background Image */}
-        <div className="h-32 w-full relative">
+        <div className="h-32 w-full relative ">
           <img
             src={shop?.image}
             alt={shop?.name}
@@ -51,14 +49,21 @@ const PopularTailorCard = ({ shop }) => {
                 || "https://cdn-icons-png.flaticon.com/512/149/149071.png"
               }
               className="w-20 h-20 rounded-full border-4 border-white object-cover"
-            />
+             onClick={()=>setSelectedImage(shop?.owner?.image)}/>
           </div>
         </div>
 
+          {selectedImage && (
+            <div className='fixed inset-0 bg-black/80 flex items-center justify-center z-50 '>
+              <img src={selectedImage} className='max-w-[80%] max-h-[60%] bg-gray-100' onClick={(e)=>e.stopPropagation(null)} />
+
+                <button className=' absolute top-5 right-5 text-white text-2xl font-bold' onClick={()=>setSelectedImage(null)}><IoMdClose/></button>
+            </div>
+          )}
+
+
         {/* Content */}
         <div className="pt-12 text-center px-2 pb-2">
-         
-
           <p className="text-sm text-gray-600 mt-1">
             {shop?.address}
           </p>

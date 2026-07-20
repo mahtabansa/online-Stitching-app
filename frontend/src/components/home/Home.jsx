@@ -9,32 +9,41 @@ const Home = () => {
   const navigate = useNavigate();
   const [username,setUsername] = useState();
   
-
   return (
 <>
-    <div className='bg-[#FEFEFE] m-4 p-4 gap-4'>
-      <h2 className='font-semibold text-xl italic py-4 px-4 items-center'>Select Service</h2>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 p-2 gap-5 sm:p-5 '>
+  <div className="max-w-6xl mx-auto bg-[#FEFEFE]  sm:p-6 rounded-xl">
+  <h2 className="w-full text-2xl font-semibold italic text-center  sm:text-left  mb-6 shadow-2xl ">
+    Select Service
+  </h2>
 
-        <div className='rounded-lg shadow-xl' style={{ width: "80%" }}>
-          <Link to='/custom_design'>
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-center mt-4">
+    
+    <Link
+      to="/custom_design"
+      className="w-full max-w-sm rounded-xl shadow-xl overflow-hidden hover:scale-105 transition-transform duration-300"
+    >
+      <img
+        src={custom_design}
+        alt="Custom Design"
+        className="w-full h-auto object-cover rounded-xl"
+      />
+    </Link>
 
-            <img src={custom_design} alt="custom design"
-              className=' rounded-lg ' />
-          </Link>
-        </div>
+    <Link
+      to="/popular_tailor"
+      className="w-full max-w-sm rounded-xl shadow-xl overflow-hidden hover:scale-105 transition-transform duration-300"
+    >
+      <img
+        src={popularTailor}
+        alt="Popular Tailor"
+        className="w-full h-auto object-cover rounded-xl"
+      />
+    </Link>
 
-        <div className='rounded-lg shadow-xl ' style={{ width: "80%" }}>
-          <Link to='/popular_tailor'>
-            <img src={popularTailor} alt="popular tailor"
-              className=' rounded-lg' />
-          </Link>
-        </div>
+  </div>
+</div>
 
-
-      </div>
-    </div>
-    <ToastContainer />
+<ToastContainer />
 </>
   )
 

@@ -18,6 +18,7 @@ const Choose = () => {
   };
   const handleClose = () => {
     setShowPopup(false);
+    dispatch(setRole(false))
     navigate('/');
   }
 

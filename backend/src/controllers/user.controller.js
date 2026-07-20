@@ -4,7 +4,6 @@ import { User } from "../models/usermodel.js";
   try {
  
     const userId = req.userId;
-   console.log("userid",userId)
 
     if (!userId) {
       return res.status(200).json({ message: "user Is not found" });

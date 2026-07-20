@@ -1,7 +1,8 @@
+import { registerSocketUser,registerSocketOwner } from './socket.js'
 import './App.css'
 import HomePage from './components/home/HomePage'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import Login from './components/Login'
+import { Login } from './components/Login.jsx'
 import SignUp from './components/Signup.jsx'
 import 'react-toastify/dist/ReactToastify.css';
 import PopularTailor from './components/services/PopularTailor'
@@ -23,8 +24,18 @@ import MyCart from './components/services/MyCart.jsx'
 import CheckOut from './components/services/CheckOut.jsx'
 import GetMyOrder from './Hooks/GetMyOrder.jsx'
 import TrackOrder from './components/services/TrackOrder.jsx'
+import { useState } from 'react'
+import Navbar from './Navbar.jsx'
+import ProductCard from './components/services/ProductCard.jsx'
+import Footer from './Footer.jsx'
+import io from 'socket.io-client';
+import { useEffect } from 'react'
+import EditAccount from './components/tailor/EditAccount.jsx'
+import Setting from './components/tailor/Setting.jsx'
+
 function App() {
-  const { userData, role } = useSelector((state) => state.user);
+  const { userData, role, isSearching, searchResults } = useSelector((state) => state.user);
+
   let userdata;
   if (userData !== null) {
     userdata = userData?.role
@@ -32,114 +43,153 @@ function App() {
   else if (role !== null) {
     userdata = role
   }
-
   GetCurrentUser();
   GetCurrentLocation();
   GetMyShop();
   GetShopInmyCity();
   GetItemsInMyCity();
   GetMyOrder()
+
+  useEffect(() => {
+    if (userData?._id) {
+      registerSocketUser(userData._id);
+    }
+  }, [userData]);
+ 
+
+  useEffect(() => {
+    if (userData?._id) {
+      registerSocketOwner(userData?._id);
+    }
+  }, [userData?._id]);
+
+
+
   return (
     <BrowserRouter>
-      {/* Popup only when not logged in */}
-      {/* 
-      { !role || !userData && <Choose />} */}
+      <div className='min-h-screen flex flex-col '>
+        <Navbar />
 
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={userData ? <HomePage /> : <Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        {/* 🔒 Protected Routes */}
-        <Route
-          path="/popular_tailor"
-          element={
-            <ProtectedRoute>
-              <PopularTailor />
-            </ProtectedRoute>
-          }
-        />
+        {isSearching && (
+          <div className="absolute top-[90px] left-0 right-0 z-50 bg-gray-100 shadow-lg max-h-[80vh] overflow-y-auto mt-5">
+            {searchResults.length > 0 ? (
+              <div className="mt-5 flex justify-center gap-4 p-4 ">
+                {searchResults.map((item) => (
+                  <ProductCard key={item._id} item={item} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-6 text-gray-500">No results found</p>
+            )}
+          </div>
+        )}
 
-        <Route
-          path="/tailor_details"
-          element={
-            <ProtectedRoute>
-              <Detail />
-            </ProtectedRoute>
-          }
-        />
+        <div className='flex-1'>
 
-        <Route
-          path="/custom_design"
-          element={
-            <ProtectedRoute>
-              <CustomDesign />
-            </ProtectedRoute>
-          }
-        />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={userData ? <HomePage /> : <Login />} />
 
-        <Route
-          path="/create-edit-shop"
-          element={
-            <ProtectedRoute>
-              <CreateEditShop />
-            </ProtectedRoute>
-          }
-        />
+            <Route path="/signup" element={<SignUp />} />
+            {/* 🔒 Protected Routes */}
+            <Route
+              path="/popular_tailor"
+              element={
 
-        <Route
-          path="/create-item"
-          element={
-            <ProtectedRoute>
-              <CreateItem />
-            </ProtectedRoute>
-          }
-        />
+                <PopularTailor />
+              }
+            />
 
+            <Route
+              path="/tailor_details"
+              element={
 
-        <Route
-          path="/edit-item/:id"
-          element={
-            <ProtectedRoute>
-              <EditItem />
-            </ProtectedRoute>
-          }
-        />
+                <Detail />
 
-        <Route path='/my-orders'
-          element={
-            <ProtectedRoute>
-              <MyOrdersHome />
-            </ProtectedRoute>
-          }
-        />
+              }
+            />
 
-        <Route path='/my-cart'
-          element={
-            <ProtectedRoute>
-              <MyCart />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/custom_design"
+              element={
+
+                <CustomDesign />
+              }
+            />
+
+            <Route
+              path="/create-edit-shop"
+              element={
+                <ProtectedRoute>
+                  <CreateEditShop />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/create-item"
+              element={
+                <ProtectedRoute>
+                  <CreateItem />
+                </ProtectedRoute>
+              }
+            />
 
 
-        <Route path='/checkout'
-          element={
-            <ProtectedRoute>
-              <CheckOut />
-            </ProtectedRoute>
-          }
-        />
-        <Route path='/track-order/:id'
-          element={
-            <ProtectedRoute>
-              <TrackOrder />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/edit-item/:id"
+              element={
+                <ProtectedRoute>
+                  <EditItem />
+                </ProtectedRoute>
+              }
+            />
 
-      </Routes>
+            <Route path='/my-orders'
+              element={
+                <ProtectedRoute>
+                  <MyOrdersHome />
+                </ProtectedRoute>
+              }
+            />
 
+            <Route path='/my-cart'
+              element={
+
+                <MyCart />
+
+              }
+            />
+
+
+            <Route path='/checkout'
+              element={
+                <ProtectedRoute>
+                  <CheckOut />
+                </ProtectedRoute>
+              }
+            />
+            <Route path='/track-order/:id'
+              element={
+                <ProtectedRoute>
+                  <TrackOrder />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route path='/setting' element={
+              <ProtectedRoute>
+                <Setting/>
+              </ProtectedRoute>
+            }
+            />
+
+          </Routes>
+
+        </div>
+        <Footer />
+      </div>
 
     </BrowserRouter>
 

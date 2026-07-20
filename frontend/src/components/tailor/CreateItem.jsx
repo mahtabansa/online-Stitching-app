@@ -1,139 +1,267 @@
-import React, { useState } from 'react'
-import Navbar from '../../Navbar.jsx'
-import axios from 'axios';
+import React, { useState, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { setMyShopData } from '../../redux/ownerSlice.js';
-import {useNavigate} from 'react-router'
+import { useNavigate, useParams } from 'react-router-dom';
 import { IoArrowBack } from "react-icons/io5";
+import { IoClose, IoAdd } from "react-icons/io5";
 import { ClipLoader } from "react-spinners";
+import { ToastContainer, toast } from 'react-toastify';
+import axiosInstance from '../../axiosInstance.js';
+import { setMyShopData } from '../../redux/ownerSlice.js';
 
-const CreateItem = () => {
-      const { myShopData } = useSelector((state) => state.owner);
-      console.log("myShopData[0]?.owner?._id",myShopData[0]?._id)
-      console.log("myshopData",myShopData)
-     const dispatch = useDispatch();
-     const navigate = useNavigate();
-      const [loading,setLoading] = useState(false);
-      const [FrontendImage, setFrontendImage] = React.useState(null);
-      const [preview, setPreview] = useState(null);
-      const [name, setName] = React.useState("");
-      const [description, setDescription] = React.useState("");
-      const [price, setPrice] = React.useState("");
+const MAX_IMAGES = 3;
 
-      const handleChange = (e) => {
-          
-            const { name, value } = e.target;
-           
-            if (name === "name") {
-                  setName(value);
-            } else if (name === "description") {
-                  setDescription(value);
-                   e.target.style.height = "auto"
-                  e.target.style.height = e.target.scrollHeight + "px"
-            } else if (name === "price") {
-                  setPrice(value);
-            }
+const EditItem = () => {
+  const { id } = useParams();
+  const { myShopData } = useSelector((state) => state.owner);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+
+  // existingImages: array of URL strings already saved in DB (that user kept)
+  const [existingImages, setExistingImages] = useState([]);
+  // newImages: array of { file, preview } for freshly added images
+  const [newImages, setNewImages] = useState([]);
+
+  const fileInputRef = useRef(null);
+
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [error, setError] = useState('');
+
+  const totalImageCount = existingImages.length + newImages.length;
+
+  // Fetch current item data on mount
+  useEffect(() => {
+    const fetchItem = async () => {
+      try {
+        const response = await axiosInstance.get(
+          `${import.meta.env.VITE_SERVER_URL}/api/items/get-item/${id}`,
+          { withCredentials: true }
+        );
+        const item = response.data;
+
+        setName(item?.name || "");
+        setDescription(item?.description || "");
+        setPrice(item?.price || "");
+
+        // normalize images: handle array, single string, or "\n" joined entries
+        const source = item?.images || item?.image;
+        const rawArray = Array.isArray(source) ? source : (source ? [source] : []);
+        const flattened = rawArray
+          .flatMap((entry) => (typeof entry === "string" ? entry.split("\n") : entry))
+          .map((url) => url?.trim())
+          .filter(Boolean);
+        setExistingImages([...new Set(flattened)]);
+      } catch (err) {
+        console.error("Error fetching item:", err);
+        toast.error("Failed to load item details");
+      } finally {
+        setFetching(false);
       }
+    };
+    fetchItem();
+  }, [id]);
 
-      const handleSubmit = async (e) => {
-            e.preventDefault();
-            setLoading(true)
-            const formData = new FormData();
-            formData.append("name", name);
-            formData.append("description", description);
-            formData.append("price", price);
-           
-            if (FrontendImage) {
-                  formData.append("image", FrontendImage);
-            }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "name") setName(value);
+    else if (name === "description") {
+      setDescription(value);
+      e.target.style.height = "auto";
+      e.target.style.height = e.target.scrollHeight + "px";
+    } else if (name === "price") setPrice(value);
+  };
 
-            try {
-                  const url = import.meta.env.VITE_SERVER_URL;
-                  console.log("FORM DATA",formData);
-                  const response = await axios.post(`${url}/api/items/create-item`, formData, { withCredentials: true })
+  const handleAddImageClick = () => {
+    if (totalImageCount >= MAX_IMAGES) return;
+    fileInputRef.current.click();
+  };
 
-                  console.log("response", response.data)
-                   setLoading(false);
-                  dispatch(setMyShopData(response.data))
-                  navigate('/')
-            } catch (err) {
-                  console.log(`errror while addig Items ${err}`);
-            }
-      }
-      const handleImage = (e) => {
-            try {
-                  const file = e.target.files[0];
+  const handleFileSelected = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-                  if (!file) return;
-                  setFrontendImage(file);
-                  const reader = new FileReader();
-                  reader.onloadend = () => {
-                        setPreview(reader.result);
-                  };
-                  reader.readAsDataURL(file);
+    if (totalImageCount >= MAX_IMAGES) {
+      toast.error("You can only have up to 3 images");
+      e.target.value = "";
+      return;
+    }
 
-            } catch (err) {
-                  console.error("Error occurred while handling image:", err);
-            }
-      }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewImages((prev) => [...prev, { file, preview: reader.result }]);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
 
-      return (
-            <>
-                  <Navbar />
-                  <div className='flex flex-col items-center gap-5 mt-5 relative'>
-                        <div className='absolute top-5 left-5 text-2xl text-gray-800' onClick={()=>navigate(-1)}><IoArrowBack/></div>
-                        <h1 className='text-3xl text-gray-600 '>Fill the all details</h1>
+  const handleRemoveExistingImage = (index) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
 
-                        <form onSubmit={handleSubmit} className='bg-gray-100 h-120 w-100 rounded-lg shadow-2xl' >
+  const handleRemoveNewImage = (index) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
+  };
 
-                              <div className=' px-5 mt-5'>
-                                    <label htmlFor="text">Design Name</label> <br />
-                                    <input type='text' placeholder='Design name' name='name'
-                                          className='w-80 p-2 border-1 rounded opacity-50' onChange={handleChange} value={name} required />
-                              </div>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-                              <div className='px-5'>
-                                    <label htmlFor="image" className='block text-sm font-medium text-gray-900 mb-2'>Design Image</label>
-                                    <input type="file" placeholder='upload your design image' className='w-80 p-2 border-1 rounded opacity-50' accept="image/*" onChange={handleImage} />
-                              </div>
-                              {preview &&
-                                    (
-                                          <div className='px-5'>
-                                                <img
-                                                      src={preview}
-                                                      alt="preview"
-                                                      className='w-80 h-[60%] border rounded-lg object-cover'
-                                                />
-                                          </div>
-                                    )
-                              }
+    if (!name.trim() || !description.trim() || !price.trim()) {
+      toast.error("Please fill all required fields", { position: "bottom-left" });
+      setError("Please fill all required fields");
+      return;
+    }
 
-                        
+    if (totalImageCount === 0) {
+      setError("At least one image is required");
+      return;
+    }
 
-                              <div className=' px-5 py-3'>
-                                    <label htmlFor="state" name='description'>Description</label> <br />
-                                    <textarea type='text' placeholder='Enter a brief description of your design' name='description'
-                                          className='w-80 p-2 border-1 rounded opacity-50' onChange={handleChange} value={description} required />
-                              </div>
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("existingImages", JSON.stringify(existingImages));
+    newImages.forEach((img) => formData.append("images", img.file));
 
-                              <div className=' px-5 py-3'>
-                                    <label htmlFor="city" name='price'>Stiching Price </label> <br />
-                                    <input type='number' placeholder='Enter your stiching price' name='price'
-                                          className='w-80 p-2 border-1 rounded opacity-50' onChange={handleChange} value={price} required />
-                              </div>
+    try {
+      setLoading(true);
+      const response = await axiosInstance.post(
+        `${import.meta.env.VITE_SERVER_URL}/api/items/edit-item/${id}`,
+        formData,
+        { withCredentials: true }
+      );
 
-                              <div className='py-2'>
-                                    <div className='flex justify-center pb-4' style={{ width: "100%" }}>
-                                          <button type='submit' className='bg-blue-600 text-white px-4 py-2 rounded-md 
-               flex justify-center align-center' onClick={handleSubmit} >{loading? <ClipLoader className=' w-full text-blue-600'/>:"Add Item" }</button>
-                                    </div>
+      toast.success("Item updated successfully");
+      setLoading(false);
+      navigate('/');
+    } catch (err) {
+      setLoading(false);
+      toast.error(err.customMessage || "Failed to update item");
+      setError(err?.response?.data?.message);
+    }
+  };
 
-                              </div>
-                        </form>
+  if (fetching) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <ClipLoader />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="gap-5 mt-5">
+        <div className='flex justify-center items-center gap-5 py-5'>
+          <button type="button" onClick={() => window.history.back()} className="text-2xl text-gray-800" aria-label="Go back">
+            <IoArrowBack />
+          </button>
+          <h1 className="text-2xl text-gray-600 mx-5 px-5">Edit item details</h1>
+        </div>
+
+        <div className='flex flex-col items-center py-5'>
+          <form onSubmit={handleSubmit} className="bg-gray-100 w-full max-w-md rounded-lg shadow-2xl pb-5">
+            <div className="px-5 mt-5">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-2">Design Name</label>
+              <input id="name" type="text" name="name" placeholder="Design name" className="w-full p-2 border rounded" onChange={handleChange} value={name} />
+            </div>
+
+            {/* Hidden file input - used for adding new images */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileSelected}
+            />
+
+            {/* Image slots - existing images + new images + add button */}
+            <div className="px-5 mt-5">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                Design Images ({totalImageCount}/{MAX_IMAGES})
+              </label>
+
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {/* Existing images (already on server) */}
+                {existingImages.map((url, index) => (
+                  <div
+                    key={`existing-${index}`}
+                    className="relative flex-shrink-0 w-28 h-36 rounded-lg overflow-hidden border border-gray-300 bg-white"
+                  >
+                    <img src={url} alt={`Design ${index + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveExistingImage(index)}
+                      className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-black/80"
+                      aria-label="Remove image"
+                    >
+                      <IoClose />
+                    </button>
                   </div>
-            </>
-      )
+                ))}
+
+                {/* Newly added images (not yet uploaded) */}
+                {newImages.map((img, index) => (
+                  <div
+                    key={`new-${index}`}
+                    className="relative flex-shrink-0 w-28 h-36 rounded-lg overflow-hidden border border-gray-300 bg-white"
+                  >
+                    <img src={img.preview} alt={`New design ${index + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveNewImage(index)}
+                      className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-black/80"
+                      aria-label="Remove image"
+                    >
+                      <IoClose />
+                    </button>
+                  </div>
+                ))}
+
+                {/* Add button */}
+                {totalImageCount < MAX_IMAGES && (
+                  <button
+                    type="button"
+                    onClick={handleAddImageClick}
+                    className="flex-shrink-0 w-28 h-36 rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-200 transition-colors"
+                    aria-label="Add another image"
+                  >
+                    <IoAdd size={26} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="px-5 py-3">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-900 mb-2">Description</label>
+              <textarea id="description" name="description" placeholder="Enter a brief description of your design" className="w-full p-2 border rounded" onChange={handleChange} value={description} />
+            </div>
+
+            <div className="px-5 py-3">
+              <label htmlFor="price" className="block text-sm font-medium text-gray-900 mb-2">Stitching Price</label>
+              <input id="price" type="number" name="price" placeholder="Enter your stitching price" className="w-full p-2 border rounded" onChange={handleChange} value={price} />
+            </div>
+
+            {error && <p className='text-center text-red-600 font-semibold'>{error}</p>}
+
+            <div className='py-2'>
+              <div className='flex justify-center pb-4' style={{ width: "100%" }}>
+                {loading ? <ClipLoader className='text-white font-semibold' /> : (
+                  <button type='submit' className='bg-blue-600 text-white px-4 py-2 rounded-md flex justify-center align-center'>Save changes</button>
+                )}
+              </div>
+            </div>
+          </form>
+
+          <ToastContainer position="top-right" autoClose={5000} />
+        </div>
+      </div>
+    </>
+  )
 }
 
-export default CreateItem
+export default EditItem

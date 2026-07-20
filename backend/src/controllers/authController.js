@@ -1,25 +1,41 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { User } from "../models/usermodel.js";
 import bcrypt from "bcrypt";
 import { createToken } from "../utils/token.js";
 import uploadOnCloudinary from "../utils/Cloudinary.js";
-
+import { getIO } from "../socket/socketHandler.js";
 
 export const signup = async (req, res, next) => {
   const { name, phone, email, password, role } = req.body;
-  console.log("name, phone,email,password", name, phone, email, password, role);
 
   try {
     if (!name || !phone || !email || !password || !role) {
       return res.json({ message: "all filled required" });
     }
+    if (password.length <= 4) {
+      return res
+        .status(422)
+        .json({ message: `password should be minimum six character` });
+    }
+
+    if (phone.length !== 10) {
+      return res
+        .status(422)
+        .json({ message: `please give valid phone number` });
+    }
+
     let user = await User.findOne({ email });
+   
     if (user) {
-      return res.send({ message: "user already exist please,login" });
+      return res
+        .status(409)
+        .send({ message: "user already exist please,login" });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
     if (!hashPassword) {
-      return res.send({ message: "error in hashing the password" });
+      return res.status(500).json({ message: "error in hashing the password" });
     }
 
     user = await User.create({
@@ -33,13 +49,13 @@ export const signup = async (req, res, next) => {
     const token = createToken(user._id);
 
     res.cookie("token", token, {
-      httpOnly: "true",
-      Secure: "false",
-      sameSite: "lax",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
       maxAge: 3 * 24 * 60 * 60 * 1000,
     });
-    res.send({ message: "user resister successfully" });
+    res.status(200).json({ message: "user resister successfully" });
     next();
   } catch (err) {
     console.log("Error in the register", err);
@@ -49,31 +65,38 @@ export const signup = async (req, res, next) => {
 export const login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
-    if (!email || !password) {
-      return res.send({ message: "Please provide email and password" });
+    if (!password || !email) {
+      return res.status(400).json({
+        success: false,
+        message: "email and password are required",
+      });
+    }
+  
+    if (password.length < 6) {
+      return res
+        .status(422)
+        .json({ message: `password must be greater than 6` });
     }
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({
+      return res.status(404).json({
         success: false,
-        message: "Invalid email or password",
+        message: "User not found",
       });
     }
     const hashPassword = await bcrypt.compare(req.body.password, user.password);
 
     if (!hashPassword) {
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          message: "Invalid email or password",
-        });
-      }
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
     }
     const token = createToken(user._id);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
       maxAge: 3 * 24 * 60 * 60 * 1000,
     });
@@ -82,7 +105,7 @@ export const login = async (req, res, next) => {
       message: "Login successful",
       token: token,
       user: {
-        name:user.name,
+        name: user.name,
         email: user.email,
         role: user.role,
         phone: user.phone,
@@ -98,14 +121,19 @@ export const login = async (req, res, next) => {
 
 const logout = async (req, res) => {
   try {
-    console.log("logout handler");
-    res.clearCookie("token");
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+    });
 
-    return res.status(200).json({ message: "signOut successfully" });
+    return res.status(200).json({ message: "Signed out successfully" });
   } catch (err) {
-    return res.status(500).json(`singOut error ${err}`);
+    return res.status(500).json({ message: `SignOut error: ${err.message}` });
   }
 };
+
 export { logout };
 
 // EditProfile = async(req,res) => {
@@ -137,7 +165,7 @@ const AddImage = async (req, res) => {
     const userId = req.userId;
 
     if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+      return res.status(404).json({ message: "No file uploaded" });
     }
 
     const imageUrl = await uploadOnCloudinary(req.file.path);
@@ -151,6 +179,9 @@ const AddImage = async (req, res) => {
       { image: imageUrl },
       { new: true },
     );
+    getIO(`user_${userId}`).emit("updateOwnerProfileImage", {
+      user: updatedUser,
+    });
 
     return res.status(200).json({
       message: "Image uploaded",

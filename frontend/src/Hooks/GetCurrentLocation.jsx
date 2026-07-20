@@ -12,7 +12,7 @@ const GetCurrentLocation = () => {
 
       useEffect(() => {
 
-            if (!userData) return;
+           
             if (navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition(async (position) => {
                         const locationData = {
@@ -27,7 +27,6 @@ const GetCurrentLocation = () => {
                        
                         const result =response.data.results[0].city ? response.data.results[0].city : response.data.results[0].county;
                         
-                        console.log("result",result);
                         const fullAddress = response.data.results[0].address_line2 + " " + response.data.results[0].address_line1 + " " + " " + response.data.results[0].state + " " + response.data.results[0].country
                         dispatch(setCurrentCity(result));
                         dispatch(setCurrentAddress(fullAddress));

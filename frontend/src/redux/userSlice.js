@@ -10,13 +10,16 @@ const userSlice = createSlice({
     currentAddress: null,
     shopsInMyCity: null,
     ItemsInMyCity: null,
+    itemsLoading: false,
     ItemCard: [],
+    CheckOutItem: [],
     TotalAmount: 0,
-    Myorder:{
-      orders:[]
+    Myorder: {
+      orders: [],
     },
     location: null,
-
+    searchResults: [],
+    isSearching: false,
   },
   reducers: {
     setUserData: (state, actions) => {
@@ -47,10 +50,11 @@ const userSlice = createSlice({
     setItemsInMyCity: (state, actions) => {
       state.ItemsInMyCity = actions.payload;
     },
-    setAddToCard: (state, actions) => {
-      const newItem = actions.payload;
-      state.ItemCard.push(newItem);
+    setAddToCard: (state, action) => {
+      const newItem = action.payload;
+
       const existingItem = state.ItemCard.find((i) => i._id === newItem._id);
+
       if (existingItem) {
         existingItem.quantity += newItem.quantity;
       } else {
@@ -61,6 +65,28 @@ const userSlice = createSlice({
         (sum, item) => sum + item.price * item.quantity,
         0,
       );
+    },
+    setCheckOut: (state, actions) => {
+      const newItem = actions.payload;
+      if (!newItem) {
+        return;
+      }
+      const existingItem = state.CheckOutItem.find(
+        (i) => i._id === newItem._id,
+      );
+      if (existingItem) {
+        existingItem.quantity += newItem.quantity;
+      } else {
+        state.CheckOutItem.push(newItem);
+      }
+      state.TotalAmount = state.CheckOutItem.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+    },
+    clearCheckOut: (state) => {
+      state.CheckOutItem = [];
+      state.CheckOutTotalAmount = 0; // ya TotalAmount, jo bhi field use kar rahe ho
     },
 
     updateQuantity: (state, actions) => {
@@ -85,12 +111,65 @@ const userSlice = createSlice({
       );
     },
 
-    AddMyOrders:(state,actions)=>{
-      const newItems = actions.payload
+    // AddMyOrders: (state, action) => {
+    //   console.log("Reducer Payload:", action.payload);
+    //   console.log("Before:", state.Myorder.orders);
 
-      state.Myorder.orders = [newItems,...state.Myorder.orders]
+    //   state.Myorder.orders.unshift(action.payload);
+
+    //   console.log("After:", state.Myorder.orders);
+    // },
+
+    SetMyOrders: (state, action) => {
+      state.Myorder.orders = action.payload;
+    },
+    AddMyOrders: (state, action) => {
+      state.Myorder.orders.unshift(action.payload);
+    },
+    setSearchResults: (state, action) => {
+      state.searchResults = action.payload;
+    },
+    setIsSearching: (state, action) => {
+      state.isSearching = action.payload;
+    },
+    updateOrderStatus: (state, action) => {
+      const { orderId, status } = action.payload;
+      const order = state.Myorder.orders.find((o) => o._id === orderId);
+      if (!status) {
+        console.log(`update status can not be null`);
+      } else if (order) {
+        order.status = status;
+      }
+    },
+    updatePickupTime: (state, action) => {
+      const { orderId, pickupTime } = action.payload;
+
+      const order = state.Myorder.orders.find((o) => o._id === orderId);
+      if (order && order.shopOrder?.[0]) {
+        order.shopOrder[0].pickup = pickupTime;
+      }
+    },
+    updateProfileImage: (state, actions) => {
+      const { userId, user } = actions.payload;
+
+      if (!userId || !user) {
+        console.log(`user Not found`);
+        return;
+      }
+      if (!state.userData) {
+        console.log("userData is null, cannot update");
+        return;
+      }
+
+      if (String(state.userData._id) === String(userId)) {
+        state.userData.image = user.image;
+      } else {
+        console.log(`user id mismatch`);
+      }
+    },
+    setItemsLoading:(state,actions)=>{
+      state.itemsLoading = actions.payload
     }
-
   },
 });
 export const {
@@ -102,11 +181,20 @@ export const {
   setCurrentLocation,
   setShopsInMyCity,
   setItemsInMyCity,
+  setItemsLoading,
   setAddToCard,
   updateQuantity,
   AddMyOrders,
+  SetMyOrders,
   removeItemFromCard,
   ClearUser,
+  setSearchResults,
+  setIsSearching,
+  updateOrderStatus,
+  setCheckOut,
+  clearCheckOut,
+  updatePickupTime,
+  updateProfileImage,
 } = userSlice.actions;
 
 export const userReducer = userSlice.reducer;

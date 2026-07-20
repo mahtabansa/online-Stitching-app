@@ -12,6 +12,7 @@ const userSchema = mongoose.Schema({
   phone: {
     type: Number,
     required: true,
+    min:10
   },
   email: {
     type: String,
@@ -21,6 +22,7 @@ const userSchema = mongoose.Schema({
   password: {
     type: String,
     required: true,
+    min:4
   },
   address: {
     type: String,
@@ -38,8 +40,10 @@ const userSchema = mongoose.Schema({
     type:String,
     enum:["customer","tailor"],
     required:true
-  }
-});
+  },
+  isOnline:{type:Boolean,default:false},
+  isShopCreated:{type:Boolean,default:false}
+},{timestamp:true});
 
 const User = mongoose.model("User", userSchema);
 export { User };

@@ -1,82 +1,188 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios'
+import { CgClose } from "react-icons/cg";
+import { useParams } from 'react-router-dom';
+import { useDispatch } from "react-redux";
 
 const OrderCard = ({ order }) => {
-  console.log("order", order);
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [showConfirm, setshowConfirm] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
+
+
+  const reasons = [
+    "Changed my mind",
+    "Ordered by mistake",
+    "Found another tailor",
+    "Delivery is taking too long",
+    "Other",
+  ];
+  const statusStyles = {
+    pending: ' text-yellow-700',
+    accepted: 'font-semibold text-blue-700',
+    stitching: 'font-semibold text-purple-700',
+    'out of delivery': 'font-semibold text-orange-700',
+    delivered: 'font-semibold text-green-700',
+    cancelled: 'font-semibold text-red-700',
+  };
+
+
+
+  const handleCancel = async (id) => {
+    console.log("cancelReason, customReason ", cancelReason, customReason)
+
+    try {
+      await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/order/cancel-order/${id}`, { cancelReason, customReason }, { withCredentials: true }).then(res => {
+      })
+    } catch (err) {
+      console.log(`error ocuured while cancelling user's order ${err}`)
+    }
+
+  };
+
+  ////this an incompelte due some isssues in place order
+
+
   return (
-    <>
-      {order &&
-        order.map((item) => (
+    <div className="w-full max-w-md bg-white rounded-xl shadow-md p-4 mb-5">
+      {order?.shopOrder?.map((shoporder) =>
+        shoporder.shopOrderItems?.map((orderItem) => (
           <div
-            key={item._id}
-            className="h-[200px] w-full bg-gray-200 sm:p-5 sm:m-5 md:w-[400px] lg:w-[400px] border border-gray-200 rounded-lg p-4 flex flex-col hover:shadow-md transition  "
+            key={orderItem._id}
+            className="flex gap-4 border-b pb-4 last:border-none"
           >
-            {/* Loop shopOrder */}
-            {item.shopOrder &&
-              item.shopOrder.map((shoporder) => (
-                <div key={shoporder._id} className="w-full flex  bg-gray-200  rounded-lg">
-                  {/* Loop shopOrderItems */}
-                  {shoporder.shopOrderItems &&
-                    shoporder.shopOrderItems.map((orderItem) => (
-                      // this is for item info
-                      <div key={orderItem._id} className="w-1/2 ">
-                        {/* Image */}
-                        <img
-                          src={orderItem.item?.image}
-                          alt="item"
-                          className="w-full  rounded-lg"
-                        />
-                      </div>
-                    ))}
+            {/* Image */}
+            <div className="w-32 h-42 flex-shrink-0">
+              <img
+                src={orderItem.item?.image}
+                alt={orderItem.item?.name}
+                className="w-full h-full object-cover rounded-lg"
+                onClick={() => setSelectedImage(orderItem.item?.image)}
+              />
+            </div>
 
-                  {/* this is for owner info */}
-                  <div className="w-full">
-                    {/* { shoporder.owner && (
-                  <div className="">
-                    <img
-                      src={shoporder.owner?.image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
-                      alt="Owner"
-                      className=" w-1/2 h-full "
-                    />
-                    
-                  </div>
-                  
-                )} */}
-                
-                    {/* Order Details */}
-                    {
-                      shoporder.shopOrderItems && shoporder.shopOrderItems.map((orderItem) => (
-                        <div key={orderItem._id} className="flex flex-col justify-between h-full pl-5  ">
+            {selectedImage && (
+              <div
+                className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+                onClick={() => setSelectedImage(null)}
+              >
+                <img
+                  src={selectedImage}
+                  alt="Preview"
+                  className="max-w-[90%] max-h-[90%] rounded-lg shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                />
 
-                          <div className=" py-5">
-                            <p>Design: {orderItem.item?.name}</p>
-                            <p >pick up: {item.shopOrder?.[0]?.status}</p>
-                            <p>Price: ₹{orderItem.item?.price}</p>
-                          </div>
+                <button
+                  className="absolute top-5 right-5 text-white text-4xl font-bold"
+                  onClick={() => setSelectedImage(null)}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
 
-                          <button className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 items-end" onClick={() => Navigate(`/track-order/${item._id}`)}>
-                            Track Order
-                          </button>
-                        </div>
-                      ))}
+            {/* Details */}
+            <div className="flex flex-col justify-between flex-1">
+              <div>
+                <h3 className="font-semibold text-lg">
+                  {orderItem.item?.name}
+                </h3>
 
+                <p>Price: ₹{orderItem.item?.price}</p>
+                <p>Quantity: {orderItem.quantity}</p>
+                <p >Status:
+                  <span className={`font-semibold  ${statusStyles[order.status]}`}> {order.status.charAt(0).toUpperCase() + order.status.slice(1).toLowerCase()}</span>
+                </p>
+                <p>Tailor: {shoporder.owner?.name}</p>
+              </div>
 
-                  </div>
-                </div>
-              ))}
+              <div className={`flex gap-2 mt-3 ${order.status === "cancelled" ? "hidden" : null}`}>
+                <button
+                  className="flex-1 bg-gray-600 text-white py-2 rounded-lg"
+                  onClick={() => navigate(`/track-order/${order?._id}`)}
 
-        
+                >
+                  {order.status === "delivered" ? "View last order" : "Track Order "}
+                </button>
+                {
+                  order.status === "delivered" ? null : <button
+                    className="flex-1 bg-red-500 text-white py-2 rounded-lg"
+                    onClick={() => setshowConfirm(true)}
+                  >
+                    Cancel Order
+                  </button>
+                }
+
+              </div>
+            </div>
           </div>
-        ))}
-    </>
+        ))
+      )}
+
+      {showConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 ">
+
+          <div className="bg-white rounded-xl p-3 w-[90%] max-w-sm shadow-xl relative">
+            <button className="absolute top-2 right-2 text-2xl hover:text-gray-600 cursor-pointer " onClick={() => { setshowConfirm(false), setCancelReason('') }}><CgClose /></button>
+            <h2 className=" text-center text-xl font-bold mb-2">
+              Cancel Order?
+            </h2>
+
+            <p className="text-gray-600 mb-5 text-center">
+              Are you sure you want to cancel this order?
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <div className="flex justify-center">
+
+                <div className="space-y-3">
+
+                  {cancelReason == 'Other' ? null : reasons.map((reason) => (
+                    <label
+                      key={reason}
+                      className="flex items-center gap-3 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="cancelReason"
+                        value={reason}
+                        checked={cancelReason === reason}
+                        onChange={(e) => setCancelReason(e.target.value)}
+                      />
+
+                      <span>{reason}</span>
+                    </label>
+                  ))}
+
+                </div>
+
+                {
+                  cancelReason === "Other" && (<textarea className="bg-gray-200 m-5 p-4 flex-1" placeholder="give your feedback for futher improvement " value={customReason} onChange={(e) => setCustomReason(e.target.value)} />
+                  )
+                }
+
+              </div>
+              <button
+                onClick={() => {
+                  handleCancel(order._id);
+                  setshowConfirm(false);
+                }}
+                className="px-4 py-2 rounded bg-red-600 text-white"
+              >
+                Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
   );
 };
 
 export default OrderCard;
-
-// <div>
-
-//               <p>Price: ₹{orderItem.price}</p>
-//               <p>Qty: {orderItem.quantity}</p>
-//             </div>

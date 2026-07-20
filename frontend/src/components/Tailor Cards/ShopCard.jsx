@@ -3,23 +3,20 @@ import { FaRegEdit } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { socket } from '../../socket.js';
+import { updateProfileImage } from '../../redux/userSlice.js';
 const ShopCard = ({ data }) => {
   const navigate = useNavigate();
   const userData = useSelector((state) => state.user.userData);
-  console.log("userData", userData);
-  console.log("shop in shop card", data);
-  const url = import.meta.env.VITE_SERVER_URL;
-
+  const dipatch = useDispatch()
   const [profileImage, setProfileImage] = useState(data?.ownerImage || null);
-
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
 
     if (!file) return;
 
-  
+
     if (file.size > 2 * 1024 * 1024) {
       alert("Image size should be less than 2MB");
       return;
@@ -41,14 +38,14 @@ const ShopCard = ({ data }) => {
 
     try {
       const response = await axios.post(
-        `${url}/api/auth/add-image`,
+        `${import.meta.env.VITE_SERVER_URL}/api/auth/add-image`,
         formData,
         {
           withCredentials: true
         }
       );
 
-      console.log("response", response.data);
+      dipatch(updateProfileImage({ userId: response.data.user._id, user: response.data.user }))
 
     } catch (error) {
       console.error("Image upload failed:", error);
@@ -59,8 +56,8 @@ const ShopCard = ({ data }) => {
     <div className="w-full max-w-3xl bg-white rounded-xl shadow-md overflow-hidden relative">
 
       {/* 🔹 Background Image */}
-      
-  {   !userData ? <p>Loading Data....</p> :<div className="relative h-56 w-full">
+
+      {!userData ? <p>Loading Data....</p> : <div className="relative h-56 w-full">
         <img
           src={data?.image}
           alt={data?.name}
@@ -72,19 +69,20 @@ const ShopCard = ({ data }) => {
           className="absolute top-4 right-4"
           onClick={() => navigate(`/create-edit-shop`)}
         >
-          <FaRegEdit className="text-2xl text-gray-800 hover:text-blue-800 cursor-pointer" />
+          <FaRegEdit className="text-2xl text-yellow-700 hover:text-yellow-900 cursor-pointer" />
         </div>
 
         {/* 👤 Profile Image (Center Overlap) */}
-        <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-1/2">
+        <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-1/2 bg-gray-200 rounded-full overflow-hidden w-24 h-24 flex items-center justify-center">
 
           <img
             src={
-            data?.owner?.image ||  profileImage ||
-              `${userData?.shop?.image.replace(/\\/g, "/")}`
+              profileImage ||
+              `${userData?.image?.replace(/\\/g, "/")}` ||
+              data?.owner?.image
             }
-            alt="owner"
-            className="w-30 h-30 rounded-full border-4 border-white object-cover cursor-pointer"
+            alt="Profile"
+            className="w-full h-full rounded-full border-4 border-white object-cover cursor-pointer flex items-center justify-center text-center text-xs text-gray-500"
             onClick={() => document.getElementById("fileInput").click()}
           />
 
@@ -99,7 +97,7 @@ const ShopCard = ({ data }) => {
 
         </div>
       </div>
-}
+      }
       {/* 🔹 Content */}
       <div className="pt-15 pb-6 text-center px-4">
         <p className="text-2xl font-semibold text-[#16161A]">

@@ -6,11 +6,11 @@ import Loader from '../pages/Loader.jsx';
 import { setUserData } from '../redux/userSlice.js';
 import { useDispatch } from 'react-redux';
 
-const Login = () => {
+export const Login = () => {
       const dispatch = useDispatch();
       const navigate = useNavigate();
       const [loading, setLoading] = useState(false);
-
+      const [error,setError] = useState('');
       const [formData, setFormData] = useState({ email: "", password: "" });
       const { email, password } = formData
       const handleChange = (e) => {
@@ -30,48 +30,44 @@ const Login = () => {
       const handlesubmit = async (e) => {
             setLoading(true)
             e.preventDefault();
+           
             try {
-                  const data = await axios.post("http://localhost:8000/api/auth/login",
+                  const data = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/auth/login`,
                         { ...formData }, { withCredentials: true });
-
-                        console.log("login response", data);
-                        
+                      
                         dispatch(setUserData(data.data.user));
                       setFormData({ email: "", password: "" })
-                  
-                  navigate('/')
-                  handleSuccess();
+                    handleSuccess();
                   setLoading(false);
 
             } catch (err) {
 
                   handleError(err.response?.data?.message || "Error in login");
-                  console.log("error in login controller", err);
                   setLoading(false);
+                  navigate('/login')
                   
             }
       }
       return (
-            <div className='bg-[#FEFEFE] flex justify-center p-5 m-5'>
+            <div className='bg-[#FEFEFE]   h-[calc(100vh-4rem)] flex items-center justify-center p-5 m-5'>
 
                   <form onSubmit={handlesubmit} className='bg-gray-200 h-100 w-100 rounded-lg shadow-xl' >
-                        <span onClick={() => navigate('/')} className='flex justify-end pr-2 pt-2 
+                        <span onClick={() => navigate('/')} className='flex justify-end pr-4 pt-4 
                            '><i className="fa-solid fa-xmark"></i></span>
-
                         <h1 className='text-center text-xl'>Login</h1>
 
-                        <div className=' px-5 py-3'>
+                        <div className='px-5 py-3 mb-2'>
                               <label htmlFor="email" name='email'>Email</label> <br />
                               <input type='email' placeholder='Enter your Email' name='email'
-                                    className='w-80 p-2 border-1 rounded opacity-50' value={email} onChange={handleChange} required />
+                                   className='w-80 p-2 border-1 rounded opacity-50 mt-1' value={email} onChange={handleChange} required />
                         </div>
 
                         <div className=' px-5 py-3'>
                               <label htmlFor="password">Password</label> <br />
                               <input type='password' placeholder='Enter your password' name='password'
-                                    className='w-80 p-2 border-1 rounded opacity-50' value={password} onChange={handleChange} required />
-                        </div>
-
+                                    className='w-80 p-2 border-1 rounded opacity-50 mt-1' value={password} onChange={handleChange} required />
+                        </div> 
+                       
                         <div className='py-5'>
                               <div className='flex justify-center pb-4' style={{ width: "100%" }}>
                                     {loading ?
@@ -96,5 +92,4 @@ const Login = () => {
       )
 }
 
-export default Login
 
