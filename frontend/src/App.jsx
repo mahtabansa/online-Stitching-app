@@ -1,4 +1,4 @@
-import { registerSocketUser,registerSocketOwner } from './socket.js'
+import { registerSocketUser, registerSocketOwner } from './socket.js'
 import './App.css'
 import HomePage from './components/home/HomePage'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
@@ -55,7 +55,7 @@ function App() {
       registerSocketUser(userData._id);
     }
   }, [userData]);
- 
+
 
   useEffect(() => {
     if (userData?._id) {
@@ -180,7 +180,7 @@ function App() {
 
             <Route path='/setting' element={
               <ProtectedRoute>
-                <Setting/>
+                <Setting />
               </ProtectedRoute>
             }
             />
@@ -188,7 +188,9 @@ function App() {
           </Routes>
 
         </div>
+  
         <Footer />
+
       </div>
 
     </BrowserRouter>

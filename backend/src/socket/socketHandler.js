@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
-
+import { configDotenv } from "dotenv";
+configDotenv();
 // socket/socketHandler.js
 
 let io = null;
@@ -9,10 +10,11 @@ export function initSocket(server) {
     console.log("⚠️ Socket already initialized, skipping...");
     return io;
   }
+  console.log("process.env.Frontend_URL in sockethandler",process.env.Frontend_URL)
 
 io = new Server(server, {
   cors: {
-    origin: "https://online-stitching-app.onrender.com", // ✅ frontend URL
+    origin:process.env.Frontend_URL, // ✅ frontend URL  "https://online-stitching-app.onrender.com"
     methods: ["GET", "POST"],
     credentials: true,
   },

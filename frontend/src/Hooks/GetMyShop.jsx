@@ -10,7 +10,7 @@ const GetMyShop = () => {
       const dispatch = useDispatch();
 
    useEffect(  () => {
-      if(!userData || myShopData ) return;
+      if(!userData || myShopData || userData?.role==="customer" ) return;
       try { 
             const fetchMyShop = async () => {
             const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/shops/my-shop`, { withCredentials: true });

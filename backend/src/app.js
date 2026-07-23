@@ -13,16 +13,17 @@ import http from "http";
 import { initSocket } from "./socket/socketHandler.js"; // Server import hata do, sirf ye rehne do
 import { errorHandler } from "./middleware/errorHandler.js";
 import {checkDbConnection} from './middleware/checkDbConnection.js'
+
 const app = express();
 const server = http.createServer(app);
 
 const io = initSocket(server);
 
 const port = process.env.PORT || 8001;
-
+console.log("process.env.Frontend_URL",process.env.Frontend_URL)
 app.use(
   cors({
-    origin: "https://online-stitching-app.onrender.com",
+    origin:process.env.Frontend_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),

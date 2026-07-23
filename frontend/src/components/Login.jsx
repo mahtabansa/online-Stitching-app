@@ -31,7 +31,7 @@ export const Login = () => {
             setLoading(true)
             e.preventDefault();
             const url = import.meta.env.VITE_BACKEND_URL;
-            console.log("import.meta.env.VITE_BACKEND_URL}",url});
+            console.log("import.meta.env.VITE_BACKEND_URL}",url);
             try {
                   const data = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
                         { ...formData }, { withCredentials: true });
