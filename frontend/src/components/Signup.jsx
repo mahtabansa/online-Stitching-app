@@ -55,7 +55,7 @@ const SignUp = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        "http://localhost:8000/api/auth/signup",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`,
         { ...formData, role: role },
         { withCredentials: true }
       );

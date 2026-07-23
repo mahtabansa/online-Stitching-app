@@ -30,9 +30,10 @@ export const Login = () => {
       const handlesubmit = async (e) => {
             setLoading(true)
             e.preventDefault();
-           
+            const url = import.meta.env.VITE_BACKEND_URL;
+            console.log("import.meta.env.VITE_BACKEND_URL}",url});
             try {
-                  const data = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/auth/login`,
+                  const data = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
                         { ...formData }, { withCredentials: true });
                       
                         dispatch(setUserData(data.data.user));

@@ -4,6 +4,7 @@ import { useSelector ,useDispatch} from 'react-redux';
 import { setShopsInMyCity } from '../redux/userSlice.js';     
 const GetShopInmyCity = () => {
       const city = useSelector((state) => state.user.currentCity);
+      console.log("city",city)
       const userData = useSelector((state) => state.user.userData);
       const dispatch = useDispatch();
  useEffect(() => {

@@ -10,12 +10,13 @@ export function initSocket(server) {
     return io;
   }
 
-  io = new Server(server, {
-    cors: {
-      origin: "http://localhost:5173",
-      credentials: true,
-    },
-  });
+io = new Server(server, {
+  cors: {
+    origin: "https://online-stitching-app.onrender.com", // ✅ frontend URL
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
   io.on("connection", (socket) => {
     console.log("New client connected:", socket.id);
