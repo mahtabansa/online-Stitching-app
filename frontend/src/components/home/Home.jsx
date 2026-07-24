@@ -11,8 +11,8 @@ const Home = () => {
   
   return (
 <>
-  <div className="max-w-6xl mx-auto bg-[#FEFEFE]  sm:p-6 rounded-xl">
-  <h2 className="w-full text-2xl font-semibold italic text-center  sm:text-left  mb-6 shadow-2xl ">
+  <div className="max-w-6xl mx-auto   sm:p-6 rounded-xl gap-4">
+  <h2 className="flex justify-around items-center w-full text-2xl font-semibold italic text-center  sm:text-left  mb-6 my-4 ">
     Select Service
   </h2>
 

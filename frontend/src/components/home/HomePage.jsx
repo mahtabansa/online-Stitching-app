@@ -7,6 +7,7 @@ import Tailordashboard from '../tailor/TailorDashboard.jsx'
 import { useState } from 'react'
 import ProductCard from '../services/ProductCard.jsx'
 import ExpertTailor from '../Tailor Cards/ExpertTailor.jsx'
+import HowWorks from '../../pages/HowWorks.jsx'
 
 const HomePage = () => {
   const { userData, shopsInMyCity } = useSelector((state) => state.user || {})
@@ -42,10 +43,12 @@ const HomePage = () => {
             <Tailordashboard />
           </>
         ) : (
-          <div className="flex flex-col items-center  min-h-screen gap-5">
+          <div className="flex flex-col items-center  gap-4 ">
             <Home />
             <Hero />
            <ExpertTailor  />
+            <HowWorks/>
+
         
           </div>
         )}
