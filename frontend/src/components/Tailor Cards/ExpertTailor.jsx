@@ -6,11 +6,8 @@ const ExpertTailor = () => {
   const { shopsInMyCity } = useSelector((state) => state.user || {})
   const shops = shopsInMyCity?.shop || []
 
-  // Decide how many tailors to show based on screen size
   const getBatchSize = () => {
     const width = window.innerWidth
-    console.log("innerwidth",width)
-
     if (width >= 1024) return 12 // lg (6 columns × 2 rows)
     if (width >= 768) return 10  // md (5 columns × 2 rows)
     if (width >= 640) return 8   // sm (4 columns × 2 rows)
