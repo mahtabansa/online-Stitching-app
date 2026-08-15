@@ -13,8 +13,7 @@ const GetShopInmyCity = () => {
             ) return;
             const fetchShopsInMyCity = async () => {
                   try {
-                        const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/shops/shops-in-my-city/${currentCity}`, { withCredentials: false });
-                        console.log("response", response)
+                        const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/shops/shops-in-my-city/${currentCity}`, { withCredentials: false });                  
                         dispatch(setShopsInMyCity(response.data));
                   } catch (err) {
                         console.log("error in fetching shops in my city", err);

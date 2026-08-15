@@ -14,7 +14,6 @@ const GetMyShop = () => {
       try { 
             const fetchMyShop = async () => {
             const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/shops/my-shop`, { withCredentials: true });
-            console.log("response",response)
             dispatch(setMyShopData(response.data));
           };
           fetchMyShop();

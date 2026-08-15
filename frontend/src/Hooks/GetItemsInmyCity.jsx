@@ -34,8 +34,6 @@ const GetItemsInMyCity = () => {
           }
         );
 
-        console.log("Items fetched");
-
         dispatch(setItemsInMyCity(response.data));
       } catch (err) {
         console.error("Error fetching items:", err);
