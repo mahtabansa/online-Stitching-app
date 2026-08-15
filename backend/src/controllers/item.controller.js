@@ -187,7 +187,6 @@ export const searchItem = async (req, res) => {
       city: { $regex: city, $options: "i" },
     }).populate("items");
 
-    console.log("searchShops", searchShops);
 
     if (searchShops.length == 0) {
       return res.status(404).json({ message: "shop not found" });
