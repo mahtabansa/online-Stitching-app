@@ -7,7 +7,7 @@ import SignUp from './components/Signup.jsx'
 import 'react-toastify/dist/ReactToastify.css';
 import PopularTailor from './components/services/PopularTailor'
 import CustomDesign from './components/services/CustomDesign'
-import Detail from './components/see details/Detail'
+import Details from './components/see details/Details.jsx'
 import GetCurrentUser from './Hooks/GetCurrentUser.jsx'
 import GetCurrentLocation from './Hooks/GetCurrentLocation.jsx'
 import { useSelector } from 'react-redux'
@@ -71,16 +71,27 @@ function App() {
         <Navbar />
 
         {isSearching && (
-          <div className="absolute top-[90px] left-0 right-0 z-50 bg-gray-100 shadow-lg max-h-[80vh] overflow-y-auto mt-5">
+  
+          <div className='absolute top-[200px] left-0 right-0 z-50 bg-[#e6dcca] shadow-lg max-h-[80vh] overflow-y-auto min-h-screen '>
+
             {searchResults.length > 0 ? (
-              <div className="mt-5 flex justify-center gap-4 p-4 ">
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 p-4 mt-5 z-0 ">
+
                 {searchResults.map((item) => (
-                  <ProductCard key={item._id} item={item} />
+                  <div key={item._id} className="w-full min-w-0">
+                    <ProductCard item={item} />
+                  </div>
                 ))}
+
               </div>
+
             ) : (
-              <p className="text-center py-6 text-gray-500">No results found</p>
+              <p className="text-center py-6 text-gray-500">
+                No results found
+              </p>
             )}
+
           </div>
         )}
 
@@ -102,10 +113,10 @@ function App() {
             />
 
             <Route
-              path="/tailor_details"
+              path="/item/:id"
               element={
 
-                <Detail />
+                <Details />
 
               }
             />
@@ -188,7 +199,7 @@ function App() {
           </Routes>
 
         </div>
-  
+
         <Footer />
 
       </div>
