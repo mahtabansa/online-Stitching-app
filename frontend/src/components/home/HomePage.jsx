@@ -19,19 +19,29 @@ const HomePage = () => {
     <>
 
       {/* Floating search results — sirf jab search active ho */}
-      {isSearching && (
-        <div className=" absolute top-[70px] left-0 right-0 z-50 bg-white shadow-lg max-h-[80vh] overflow-y-auto min-h-screen">
+      {/* {isSearching && (
+        <div className="absolute top-[70px] left-0 right-0 z-50 bg-white shadow-lg max-h-[80vh] overflow-y-auto min-h-screen">
+
           {searchResults.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
+
               {searchResults.map((item) => (
-                <ProductCard key={item._id} item={item} />
+                <div key={item._id} className="w-full min-w-0">
+                  <ProductCard item={item} />
+                </div>
               ))}
+
             </div>
+
           ) : (
-            <p className="text-center py-6 text-gray-500">No results found</p>
+            <p className="text-center py-6 text-gray-500">
+              No results found
+            </p>
           )}
+
         </div>
-      )}
+      )} */}
 
       {/* Normal page — isSearching true hone par blur/dim kar sakte hain */}
       <div className={isSearching ? 'pointer-events-none blur-sm ' : ''}>
@@ -43,13 +53,13 @@ const HomePage = () => {
             <Tailordashboard />
           </>
         ) : (
-          <div className="flex flex-col items-center  gap-4 ">
+          <div className={`flex flex-col items-center  gap-4 `}>
             <Home />
             <Hero />
-           <ExpertTailor  />
-            <HowWorks/>
+            <ExpertTailor />
+            <HowWorks />
 
-        
+
           </div>
         )}
       </div>
