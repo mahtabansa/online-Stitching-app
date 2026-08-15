@@ -1,62 +1,94 @@
 import React, { useState, useMemo } from 'react'
 import { setAddToCard, setCheckOut } from '../../redux/userSlice.js'
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { IoChevronForward } from "react-icons/io5";
+import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { IoMdClose } from 'react-icons/io'
+import { IoChevronForward } from 'react-icons/io5'
 
 const UserScrollCard = ({ item }) => {
-  const [quantity, setQuantity] = useState(1);
-  const dispatch = useDispatch()
-  const navigate = useNavigate();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [zoomImage, setZoomImage] = useState(null);
-  // Normalize item.image into a clean array of valid URLs.
-  // Handles both single-image and multi-image (up to 3) items,
-  // and cases where one array entry has multiple URLs joined by "\n".
-  const images = useMemo(() => {
-    const source = item?.images || item?.image;
-    if (!source) return [];
+  const [quantity, setQuantity] = useState(1)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [zoomImage, setZoomImage] = useState(null)
 
-    const rawArray = Array.isArray(source) ? source : [source];
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  // Normalize images
+  const images = useMemo(() => {
+    const source = item?.images || item?.image
+
+    if (!source) return []
+
+    const rawArray = Array.isArray(source)
+      ? source
+      : [source]
 
     const flattened = rawArray
-      .flatMap((entry) => (typeof entry === "string" ? entry.split("\n") : entry))
+      .flatMap((entry) =>
+        typeof entry === 'string'
+          ? entry.split('\n')
+          : entry
+      )
       .map((url) => url?.trim())
-      .filter(Boolean);
+      .filter(Boolean)
 
-    return [...new Set(flattened)];
-  }, [item?.images, item?.image]);
+    return [...new Set(flattened)]
+  }, [item?.images, item?.image])
 
-  const hasMultipleImages = images.length > 1;
+  const hasMultipleImages = images.length > 1
 
+  // Next image
   const handleNextImage = (e) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
-  };
+    e.stopPropagation()
 
-  const handlebook = () => {
-    const updatedItem = { ...item, quantity: quantity }
+    setCurrentImageIndex(
+      (prev) => (prev + 1) % images.length
+    )
+  }
+
+  // Book
+  const handleBook = () => {
+    const updatedItem = {
+      ...item,
+      quantity: quantity > 0 ? quantity : 1
+    }
+
     dispatch(setCheckOut(updatedItem))
     navigate('/checkout')
   }
 
+  // Add to cart
   const handleAdd = () => {
-    const updatedItem = { ...item, quantity: quantity > 0 ? quantity : 1 }
+    const updatedItem = {
+      ...item,
+      quantity: quantity > 0 ? quantity : 1
+    }
+
     dispatch(setAddToCard(updatedItem))
   }
 
   return (
-    <div className="w-[260px] h-80 bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden cursor-pointer">
+    <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300 flex flex-col h-full">
 
-      {/* Image */}
-      <div className="relative h-[50%] bg-gray-200 flex items-center justify-center overflow-hidden">
-        <img
-          src={images[currentImageIndex]}
-          alt={item?.name}
-          className="h-full m-auto hover:scale-105 transition duration-300"
-          onClick={() => setZoomImage(images[currentImageIndex])}
-        />
+      {/* ================= IMAGE ================= */}
+      <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden">
 
+        {images.length > 0 ? (
+          <img
+            src={images[currentImageIndex]}
+            alt={item?.name}
+            className="w-full h-full object-cover hover:scale-105 transition duration-300 cursor-pointer"
+            onClick={() =>
+              setZoomImage(images[currentImageIndex])
+            }
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400">
+            No Image
+          </div>
+        )}
+
+        {/* Next Image Button */}
         {hasMultipleImages && (
           <button
             type="button"
@@ -68,13 +100,16 @@ const UserScrollCard = ({ item }) => {
           </button>
         )}
 
+        {/* Image Dots */}
         {hasMultipleImages && (
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
             {images.map((_, index) => (
               <span
                 key={index}
-                className={`w-1.5 h-1.5 rounded-full ${
-                  index === currentImageIndex ? "bg-white" : "bg-white/50"
+                className={`w-2 h-2 rounded-full ${
+                  index === currentImageIndex
+                    ? 'bg-white'
+                    : 'bg-white/40'
                 }`}
               />
             ))}
@@ -82,7 +117,7 @@ const UserScrollCard = ({ item }) => {
         )}
       </div>
 
-      {/* Design zoomed Image */}
+      {/* ================= ZOOM IMAGE ================= */}
       {zoomImage && (
         <div
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
@@ -96,39 +131,65 @@ const UserScrollCard = ({ item }) => {
           />
 
           <button
-            className="absolute top-5 right-5 text-white text-4xl font-bold cursor-pointer"
+            type="button"
             onClick={() => setZoomImage(null)}
+            className="absolute top-5 right-5 text-white text-4xl cursor-pointer"
           >
-            ✕
+            <IoMdClose />
           </button>
         </div>
       )}
 
-      {/* Content */}
-      <div className="p-4 space-y-2">
+      {/* ================= CONTENT ================= */}
+      <div className="p-3 flex flex-col flex-1">
 
-        {/* Title */}
-        <div className="font-semibold text-gray-800 line-clamp-2 relative">
-          <span className='text-lg font-semibold'>{item?.name}</span>
-          <span className='absolute text-lg font-semibold inset-y-0 right-0'> ₹{item?.price}</span>
-        </div>
+        {/* Name */}
+        <h2 className="text-sm md:text-base font-semibold line-clamp-2">
+          {item?.name}
+        </h2>
+
+        {/* Price */}
+        <p className="text-[#C7843B] font-bold text-lg mt-1">
+          ₹{item?.price}
+        </p>
 
         {/* Description */}
-        <p className="text-xs text-gray-500 line-clamp-2">
+        <p className="text-gray-500 text-sm mt-2 line-clamp-2">
           {item?.description}
         </p>
 
-        {/* Button */}
-        <div className='w-full flex justify-between gap-5'>
-          <button className="w-1/3 mt-2 bg-gray-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-[#e04326] transition" onClick={handlebook}>
+        {/* See Details */}
+        <button
+          type="button"
+          onClick={() => navigate(`/item/${item?._id}`)}
+          className="text-[#C7843B] text-sm font-medium mt-1 self-start hover:underline"
+        >
+          See Details..
+        </button>
+
+        {/* ================= BUTTONS ================= */}
+        <div className="mt-auto flex gap-2 pt-4">
+
+          <button
+            type="button"
+            onClick={handleBook}
+            className="flex-1 bg-gray-700 hover:bg-[#C7843B] text-white py-2 rounded-lg text-xs md:text-sm transition"
+          >
             Book Now
           </button>
-          <button className="w-1/3 mt-2 bg-gray-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-[#e04326] transition" onClick={handleAdd}>
+
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="flex-1 bg-gray-700 hover:bg-[#C7843B] text-white py-2 rounded-lg text-xs md:text-sm transition"
+          >
             Add Cart
           </button>
+
         </div>
 
       </div>
+
     </div>
   )
 }

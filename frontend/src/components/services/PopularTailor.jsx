@@ -23,7 +23,7 @@ const PopularTailor = () => {
             <IoMdArrowBack />
           </span>
 
-          <h1 className='text-xl md:text-3xl lg:text-3xl pl-5 font-semibold'>
+          <h1 className='text-lg md:text-3xl lg:text-3xl pl-2 font-semibold'>
            Stitch with your Favourite tailor
           </h1>
 
@@ -41,7 +41,7 @@ const PopularTailor = () => {
           {
             shopData.length === 0 && (
               <p className='text-center text-xl opacity-75 py-10 w-full'>
-                No popular tailor found in your city
+                No tailor found in your city
               </p>
             )
           }

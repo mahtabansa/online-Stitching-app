@@ -32,7 +32,6 @@ const CheckOut = () => {
       const { address } = useSelector(state => state.map);
       const { TotalAmount, CheckOutItem, Myorder, userData, location, currentAddress } = useSelector(state => state.user);
 
-
       const apikey = import.meta.env.VITE_GEOCODING_APIKEY;
       const [addressInput, setAddressInput] = useState(address || currentAddress || "");
       const [StitchingMethod, setStitchingMethod] = useState("tailor");
@@ -108,7 +107,7 @@ const CheckOut = () => {
 
       const handleBack = () => {
             dispatch(clearCheckOut(null))
-            navigate("/")
+             window.history.back(-1);
 
       }
       const handlePlaceOrder = async () => {
@@ -164,7 +163,7 @@ const CheckOut = () => {
                         <div className='w-full max-w-[900px] flex  flex-col rounded-lg bg-white shadow-lg space-y-6'>
                               <h1 className='font-bold text-2xl text-gray-800 m-4 text-center'>CheckOut</h1>
                               <section>
-                                    <h2 className='flex items-center text-xl gap-2 m-4 font-bold'><CiLocationOn className='text-blue-700  text-2xl' />Pickup & Delivery Location</h2>
+                                    <h2 className='flex items-center text-xl gap-2 m-4 font-semibold'><CiLocationOn className='text-red-700  text-2xl' />Pickup & Delivery Location</h2>
 
                                     <div className='gap-4 flex items-center m-4'>
                                           <input type="text" className='w-full rounded-md p-2 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400' placeholder='Enter your pickup & delivery address..' value={addressInput} onChange={(e) => setAddressInput(e.target.value)} required />
@@ -249,7 +248,7 @@ const CheckOut = () => {
 
                                                 <div className='flex justify-between my-2'>
                                                       <h3 className='text-gray-700'>Subtotal</h3>
-                                                      <h3 className='text-gray-700'>₹{TotalAmount}</h3>
+                                                      <h3 className='text-gray-700'>₹{TotalAmount || CheckOutItem?.price}</h3>
                                                 </div>
                                                 <div className='flex justify-between'>
                                                       <h3 className='text-gray-700'>Delivery Fee</h3>
@@ -267,7 +266,7 @@ const CheckOut = () => {
                               </section>
 
                               <section>
-                                    <button className='w-[97%]  bg-gray-800 text-white py-2 p-4 m-4 rounded-md text-lg font-medium hover:bg-gray-600 ' onClick={handlePlaceOrder}>
+                                    <button className='w-[97%]  bg-gray-800 text-white py-2 p-4 m-4 rounded-md text-lg font-medium  hover:bg-[#C7843B] ' onClick={handlePlaceOrder}>
                                           placeOrder
                                     </button>
                               </section>

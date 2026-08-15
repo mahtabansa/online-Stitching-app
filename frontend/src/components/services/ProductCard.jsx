@@ -1,91 +1,134 @@
 import { useNavigate } from 'react-router-dom'
-import { memo } from 'react'
-import { useState } from 'react';
-import { setAddToCard, setIsSearching } from '../../redux/userSlice';
-import { useDispatch } from 'react-redux';
+import { memo, useState } from 'react'
+import { setAddToCard, setIsSearching } from '../../redux/userSlice'
+import { useDispatch } from 'react-redux'
+import { IoMdClose } from 'react-icons/io'
+
 const ProductCard = memo(({ item }) => {
   const dispatch = useDispatch()
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [quantity, setQuantity] = useState(1);
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const handlebook = () => {
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [quantity] = useState(1)
+
+  // ================= BOOK NOW =================
+  const handleBook = () => {
     const updatedItem = {
-      ...item, quantity: quantity
+      ...item,
+      quantity
     }
+
     dispatch(setAddToCard(updatedItem))
     dispatch(setIsSearching(false))
     navigate('/checkout')
   }
 
+  // ================= ADD TO CART =================
   const handleAdd = () => {
     const updatedItem = {
-      ...item, quantity: quantity > 0 ? quantity : 1
+      ...item,
+      quantity: quantity > 0 ? quantity : 1
     }
-     
+
     dispatch(setAddToCard(updatedItem))
     dispatch(setIsSearching(false))
-
-
   }
 
-
   return (
-    <div className="mt-5 w-[260px] h-90 bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden cursor-pointer">
-      <div className="h-[50%] bg-gray-200 flex items-center justify-center overflow-hidden">
-        <img
-          src={item?.image}
-          alt={item?.name}
-          loading="lazy"
-          className="h-full hover:scale-105 transition duration-300"
-          onClick={() => setSelectedImage(item?.image)}
-        />
+<div className="w-full bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+
+      {/* ================= IMAGE ================= */}
+      <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden">
+
+        {item?.image ? (
+          <img
+            src={item.image}
+            alt={item?.name}
+            loading="lazy"
+            className="w-full h-full object-cover hover:scale-105 transition duration-300 cursor-pointer"
+            onClick={() => setSelectedImage(item.image)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400">
+            No Image
+          </div>
+        )}
+
       </div>
 
+      {/* ================= ZOOM IMAGE ================= */}
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/80 flex justify-center items-center z-50"
           onClick={() => setSelectedImage(null)}
         >
           <img
             src={selectedImage}
             alt="Preview"
-            className="max-w-[90%] max-h-[90%] rounded-lg shadow-2xl"
+            className="max-w-[90%] max-h-[90%] rounded-lg"
             onClick={(e) => e.stopPropagation()}
           />
 
           <button
-            className="absolute top-5 right-5 text-white text-4xl font-bold"
+            type="button"
             onClick={() => setSelectedImage(null)}
+            className="absolute top-5 right-5 text-white text-4xl"
           >
-            ✕
+            <IoMdClose />
           </button>
         </div>
       )}
 
-      <div className="p-4 space-y-2">
-        <h2 className="text-sm font-semibold text-gray-800 line-clamp-2">
-          <span className="font-semibold">Design</span>, {item?.name}
+      {/* ================= CONTENT ================= */}
+      <div className="p-3 flex flex-col flex-1">
+
+        {/* Product Name */}
+        <h2 className="text-sm md:text-base font-semibold line-clamp-2">
+          {item?.name}
         </h2>
-        <p className="text-gray-800">
-          <span className="font-semibold">Price,</span> ₹{item?.price}
+
+        {/* Price */}
+        <p className="text-[#C7843B] font-bold text-lg mt-1">
+          ₹{item?.price}
         </p>
-        <p className="text-xs text-gray-500 line-clamp-2">{item?.description}</p>
-        <div className="w-full flex justify-between gap-5">
+
+        {/* Description */}
+        <p className="text-gray-500 text-sm mt-2 line-clamp-2">
+          {item?.description}
+        </p>
+
+        {/* See Details */}
+        <button
+          type="button"
+          onClick={() => navigate(`/item/${item?._id}`)}
+          className="text-[#C7843B] text-sm font-medium mt-1 self-start hover:underline"
+        >
+          See Details..
+        </button>
+
+        {/* ================= BUTTONS ================= */}
+        <div className="mt-auto flex gap-2 pt-4">
+
           <button
-            className="w-1/3 mt-2 bg-gray-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-[#e04326] transition"
-            onClick={handlebook}
+            type="button"
+            onClick={handleBook}
+            className="flex-1 bg-gray-700 hover:bg-[#C7843B] text-white py-2 rounded-lg text-xs md:text-sm transition"
           >
             Book Now
           </button>
+
           <button
-            className="w-1/3 mt-2 bg-gray-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-[#e04326] transition"
+            type="button"
             onClick={handleAdd}
+            className="flex-1 bg-gray-700 hover:bg-[#C7843B] text-white py-2 rounded-lg text-xs md:text-sm transition"
           >
             Add Cart
           </button>
+
         </div>
+
       </div>
+
     </div>
   )
 })

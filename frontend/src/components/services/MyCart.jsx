@@ -7,20 +7,20 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setCheckOut } from '../../redux/userSlice.js';
 const MyCart = () => {
-  const { ItemCard,TotalAmount } = useSelector((state) => state.user);
+  const { ItemCard, TotalAmount } = useSelector((state) => state.user);
   const cartItems = ItemCard || [];
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
- 
+
   const handleBookOrder = () => {
     if (!cartItems || cartItems.length === 0) return;
- 
+
     // push every cart item into CheckOutItem before navigating
     cartItems.forEach((item) => {
       dispatch(setCheckOut(item));
     });
- 
+
     navigate("/checkout");
   };
 
@@ -47,34 +47,37 @@ const MyCart = () => {
               </button>
             </p>
           </div>
-        ) :     <div className="w-full flex flex-col items-center pb-28">
-      {/* Sab items ek hi div ke andar render ho rahe hain */}
-      <div className="w-full flex flex-col items-center gap-4 p-4">
-        {cartItems && cartItems.length > 0 ? (
-          cartItems.map((item) => <CartItemCard item={item} key={item._id} />)
-        ) : (
-          <p className="text-gray-500 mt-10">Your cart is empty</p>
-        )}
-      </div>
- 
-      {/* Amazon jaisa sticky bottom bar */}
-      {cartItems && cartItems.length > 0 && (
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)] p-4 flex items-center justify-between z-40">
-          <div>
-            <p className="text-sm text-gray-500">Total Amount</p>
-            <p className="text-lg font-semibold text-gray-900">₹{TotalAmount}</p>
+        ) : <div className="w-full flex flex-col items-center pb-28">
+          {/* Sab items ek hi div ke andar render ho rahe hain */}
+          <div className="w-full flex flex-col items-center gap-4 p-4">
+            {cartItems && cartItems.length > 0 ? (
+              cartItems.map((item) => <CartItemCard item={item} key={item._id} />)
+            ) : (
+              <p className="text-gray-500 mt-10">Your cart is empty</p>
+            )}
           </div>
- 
-          <button
-            onClick={handleBookOrder}
-            className="bg-gray-500 hover:bg-gray-600 text-white font-medium px-6 py-3 rounded-lg transition"
-          >
-            Book Order
-          </button>
+
+          {/* Amazon jaisa sticky bottom bar */}
+          {cartItems && cartItems.length > 0 && (
+            <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)] p-4 flex items-center justify-between z-40">
+              <div>
+                <p className="text-sm text-gray-500">Total Amount</p>
+                <p className="text-lg font-semibold text-gray-900">₹{TotalAmount}</p>
+              </div>
+
+              <button
+                onClick={handleBookOrder}
+                className="bg-gray-700 hover:bg-[#C7843B] 
+                 text-white
+                transition-all
+                duration-200  font-medium px-6 py-3 rounded-lg"
+              >
+                Book Order
+              </button>
+            </div>
+          )}
         </div>
-      )}
-    </div>
-}
+        }
       </div>
     </>
   )
