@@ -1,37 +1,34 @@
-import { registerSocketUser, registerSocketOwner } from './socket.js'
-import './App.css'
-import HomePage from './components/home/HomePage'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Login } from './components/Login.jsx'
-import SignUp from './components/Signup.jsx'
+import { registerSocketUser, registerSocketOwner } from './socket.js';
+import './App.css';
+import HomePage from './components/home/HomePage';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Login } from './components/Login.jsx';
+import SignUp from './components/Signup.jsx';
 import 'react-toastify/dist/ReactToastify.css';
-import PopularTailor from './components/services/PopularTailor'
-import CustomDesign from './components/services/CustomDesign'
-import Details from './components/see details/Details.jsx'
-import GetCurrentUser from './Hooks/GetCurrentUser.jsx'
-import GetCurrentLocation from './Hooks/GetCurrentLocation.jsx'
-import { useSelector } from 'react-redux'
-import Choose from './Choose.jsx'
-import ProtectedRoute from './ProtectedRoute.jsx'
-import CreateEditShop from './components/tailor/CreateEditShop.jsx'
-import CreateItem from './components/tailor/CreateItem.jsx'
-import GetShopInmyCity from './Hooks/GetShopInmyCity.jsx'
-import GetMyShop from './Hooks/GetMyShop.jsx'
-import EditItem from './components/tailor/EditItem.jsx'
-import MyOrdersHome from './components/tailor/MyOrdersHome.jsx'
-import GetItemsInMyCity from './Hooks/GetItemsInmyCity.jsx'
-import MyCart from './components/services/MyCart.jsx'
-import CheckOut from './components/services/CheckOut.jsx'
-import GetMyOrder from './Hooks/GetMyOrder.jsx'
-import TrackOrder from './components/services/TrackOrder.jsx'
-import { useState } from 'react'
-import Navbar from './Navbar.jsx'
-import ProductCard from './components/services/ProductCard.jsx'
+import PopularTailor from './components/services/PopularTailor';
+import CustomDesign from './components/services/CustomDesign';
+import Details from './components/see details/Details.jsx';
+import GetCurrentUser from './Hooks/GetCurrentUser.jsx';
+import GetCurrentLocation from './Hooks/GetCurrentLocation.jsx';
+import { useSelector } from 'react-redux';
+import ProtectedRoute from './ProtectedRoute.jsx';
+import CreateEditShop from './components/tailor/CreateEditShop.jsx';
+import CreateItem from './components/tailor/CreateItem.jsx';
+import GetShopInmyCity from './Hooks/GetShopInmyCity.jsx';
+import GetMyShop from './Hooks/GetMyShop.jsx';
+import EditItem from './components/tailor/EditItem.jsx';
+import MyOrdersHome from './components/tailor/MyOrdersHome.jsx';
+import GetItemsInMyCity from './Hooks/GetItemsInmyCity.jsx';
+import MyCart from './components/services/MyCart.jsx';
+import CheckOut from './components/services/CheckOut.jsx';
+import GetMyOrder from './Hooks/GetMyOrder.jsx';
+import TrackOrder from './components/services/TrackOrder.jsx';
+import Navbar from './Navbar.jsx';
+import ProductCard from './components/services/ProductCard.jsx';
 import Footer from './Footer.jsx'
-import io from 'socket.io-client';
-import { useEffect } from 'react'
-import EditAccount from './components/tailor/EditAccount.jsx'
-import Setting from './components/tailor/Setting.jsx'
+import { useEffect } from 'react';
+import Profile from './components/profile/Profile.jsx';
+import UpdateProfile from './components/profile/UpdateProfile.jsx';
 
 function App() {
   const { userData, role, isSearching, searchResults } = useSelector((state) => state.user);
@@ -48,7 +45,7 @@ function App() {
   GetMyShop();
   GetShopInmyCity();
   GetItemsInMyCity();
-  GetMyOrder()
+  GetMyOrder();
 
   useEffect(() => {
     if (userData?._id) {
@@ -56,13 +53,11 @@ function App() {
     }
   }, [userData]);
 
-
   useEffect(() => {
     if (userData?._id) {
       registerSocketOwner(userData?._id);
     }
   }, [userData?._id]);
-
 
 
   return (
@@ -189,9 +184,16 @@ function App() {
               }
             />
 
-            <Route path='/setting' element={
+            <Route path='/profile' element={
               <ProtectedRoute>
-                <Setting />
+                <Profile />
+              </ProtectedRoute>
+            }
+            />
+
+              <Route path='/update-profile' element={
+              <ProtectedRoute>
+                <UpdateProfile />
               </ProtectedRoute>
             }
             />
@@ -210,4 +212,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
