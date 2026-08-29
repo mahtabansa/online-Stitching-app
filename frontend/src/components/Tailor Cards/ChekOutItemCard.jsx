@@ -1,14 +1,16 @@
 import React from 'react'
 
 const ChekOutItemCard = ({ item }) => {
+
       return (
             <div className="w-full flex justify-between  border border-gray-200 rounded-lg 
 flex flex-col sm:flex-row gap-4 hover:shadow-md transition">
 
                   {/* Image */}
+                  
                   <div className=" h-32 flex-shrink-0 bg-gray-100">
                         <img
-                              src={item?.image}
+                              src={item?.image[0]}
                               alt={item?.name}
                               className="w-full h-full object-contain"
                         />
