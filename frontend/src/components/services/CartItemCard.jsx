@@ -17,7 +17,6 @@ function CartItemCard({ item }) {
     if (item.quantity > 1) {
       dispatch(updateQuantity({ id: item._id, quantity: item.quantity - 1 }));
     } else {
-      // quantity is already 1, decreasing further means remove the item
       dispatch(removeItemFromCard({ id: item._id }));
     }
   };
@@ -28,10 +27,10 @@ function CartItemCard({ item }) {
       {/* Image */}
       <div className="w-full sm:w-32 h-40 sm:h-32 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
         <img
-          src={item?.image}
+          src={item?.image[0]}
           alt={item?.name}
           className="w-full h-full object-contain cursor-pointer"
-          onClick={() => setSelectedImage(item?.image)}
+          onClick={() => setSelectedImage(item?.image[0])}
         />
       </div>
 
