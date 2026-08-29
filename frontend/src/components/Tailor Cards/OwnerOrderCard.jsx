@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { updateOrderStatus } from '../../redux/userSlice.js';
 import { socket } from '../../socket.js';
 function OwnerOrderCard({ item }) {
-  console.log("item",item)
+
   const [status, setStatus] = useState(item?.status);
   const [pickupTime, setPickupTime] = useState(item?.shopOrder?.[0]?.pickup);
   const dispatch = useDispatch();
@@ -23,9 +23,7 @@ function OwnerOrderCard({ item }) {
   const [error, setError] = useState('');
 
   const shopOrder = item.shopOrder?.[0];
-  const orderItem = shopOrder?.shopOrderItems?.[0]?.item;
-  const quantity = shopOrder?.shopOrderItems?.[0]?.quantity;
-
+  
   const timeOptions = [
     "8-10 AM", "10-12 PM", "12-2 PM", "2-4 PM",
     "4-6 PM", "6-8 PM", "8-10 PM",
@@ -149,9 +147,9 @@ function OwnerOrderCard({ item }) {
         { otp: deliveryOtpInput },
         { withCredentials: true }
       );
-       
-       setStatus(res.data.order.status)
-       dispatch(updateOrderStatus({ orderId: item._id, status: res?.data?.order?.status }))// "delivered"
+
+      setStatus(res.data.order.status)
+      dispatch(updateOrderStatus({ orderId: item._id, status: res?.data?.order?.status }))// "delivered"
       setDeliveryOtpInput('');
     } catch (err) {
       console.log(err);
@@ -177,7 +175,7 @@ function OwnerOrderCard({ item }) {
         { withCredentials: true }
       );
       setStatus(res.data.order.status);
-         dispatch(updateOrderStatus({ orderId:item._id ,status:res.data.order.status})) // backend se confirmed status set karo
+      dispatch(updateOrderStatus({ orderId: item._id, status: res.data.order.status })) // backend se confirmed status set karo
     } catch (err) {
       console.log(err);
       setStatus(prevStatus); // ✅ FIX: rollback purani status pe, na ki null
@@ -197,31 +195,79 @@ function OwnerOrderCard({ item }) {
       default: return 'bg-gray-100 text-gray-700';
     }
   };
-
+  // update cancelOrder status
+  useEffect(() => {
+    socket.on("orderStatusUpdate", (data) => {
+      console.log("data ", data)
+      dispatch(updateOrderStatus({ orderId: data.orderId, status: data.status }));
+    });
+  }, []);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 w-full max-w-md mx-auto mb-5">
       {/* Item details */}
-      <div className="flex gap-4">
-        <img
-          src={orderItem?.image}
-          alt={orderItem?.name}
-          className="w-24 h-24 object-cover rounded-lg border"
-        />
-        <div className="flex-1">
-          <h2 className="text-lg font-semibold text-gray-800">{orderItem?.name}</h2>
-          <p className="text-sm text-gray-600">Qty: {quantity}</p>
-          <p className="text-sm text-gray-600">Price: ₹{shopOrder?.subtotal}</p>
-          <p className="text-sm text-gray-500">Method: {item.StitchingMethod}</p>
-        </div>
-      </div>
 
-      {/* User details */}
-      <div className="mt-3 border-t pt-3">
-        <p className="text-sm text-gray-800 font-medium">{item.user?.name}</p>
-        <p className="text-sm text-gray-600">{item.user?.phone}</p>
-        <p className="text-sm text-gray-600">{item.deliveryAddress}</p>
-      </div>
+      {shopOrder?.shopOrderItems &&
+        shopOrder.shopOrderItems.length > 0 && (
+          <div className="w-full">
+
+            {/* All Items */}
+            <div className="flex flex-col gap-5">
+              {shopOrder.shopOrderItems.map((orderItem, index) => (
+                <div
+                  key={orderItem?._id || index}
+                  className="flex flex-col sm:flex-row gap-4 border-b pb-5"
+                >
+                  {/* Image */}
+                  <img
+                    src={orderItem?.item?.image}
+                    alt={orderItem?.item?.name}
+                    className="w-full sm:w-30 h-48 sm:h-24 object-cover rounded-lg border"
+                  />
+
+                  {/* Item Details */}
+                  <div className="flex-1">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      {orderItem?.item?.name}
+                    </h2>
+
+                    <p className="text-sm text-gray-600">
+                      Qty: {orderItem?.quantity}
+                    </p>
+
+                    <p className="text-sm text-gray-600">
+                      Price: ₹{orderItem?.price}
+                    </p>
+
+                    <p className="text-sm text-gray-500">
+                      Method: {orderItem?.StitchingMethod}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* User Details - Bottom */}
+            <div className="mt-5 border-t pt-4">
+              <h3 className="text-base font-semibold text-gray-800 mb-2">
+                Customer Details
+              </h3>
+
+              <p className="text-sm text-gray-800 font-medium">
+                {shopOrder?.user?.name}
+              </p>
+
+              <p className="text-sm text-gray-600">
+                {shopOrder?.user?.phone}
+              </p>
+
+              <p className="text-sm text-gray-600">
+                {shopOrder?.deliveryAddress}
+              </p>
+            </div>
+          </div>
+        )}
+
 
       {/*  here will be the status input option dropdown*/}
       {/* Total + status badge */}
@@ -248,7 +294,7 @@ function OwnerOrderCard({ item }) {
 
         ) : (
           <span className={`text-xs px-2 py-1 rounded-full capitalize ${getBadgeColor(status)}`}>
-            {status.replace(/_/g, ' ')}
+            {status}
           </span>
         )}
       </div>
