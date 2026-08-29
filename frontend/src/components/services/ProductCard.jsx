@@ -3,13 +3,67 @@ import { memo, useState } from 'react'
 import { setAddToCard, setIsSearching } from '../../redux/userSlice'
 import { useDispatch } from 'react-redux'
 import { IoMdClose } from 'react-icons/io'
-
+import { IoChevronForward } from 'react-icons/io5'
+import { useMemo } from 'react'
 const ProductCard = memo(({ item }) => {
+  const [quantity] = useState(1)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [zoomImage, setZoomImage] = useState(null)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const [selectedImage, setSelectedImage] = useState(null)
-  const [quantity] = useState(1)
+  
+
+  const images = useMemo(() => {
+    if (!item?.image) return []
+
+    const rawArray = Array.isArray(item.image)
+      ? item.image
+      : [item.image]
+
+    const flattened = rawArray
+      .flatMap((entry) =>
+        typeof entry === "string"
+          ? entry.split("\n")
+          : entry
+      )
+      .map((url) => url?.trim())
+      .filter(Boolean)
+
+    return [...new Set(flattened)]
+  }, [item?.image])
+
+  const hasMultipleImages = images.length > 1
+
+  const handleNextImage = (e) => {
+    e.stopPropagation()
+    setCurrentImageIndex((prev) => (prev + 1) % images.length)
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // ================= BOOK NOW =================
   const handleBook = () => {
@@ -35,49 +89,64 @@ const ProductCard = memo(({ item }) => {
   }
 
   return (
-<div className="w-full bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+    <div className="w-full bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
 
-      {/* ================= IMAGE ================= */}
+      {/* Image */}
       <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden">
 
-        {item?.image ? (
-          <img
-            src={item.image}
-            alt={item?.name}
-            loading="lazy"
-            className="w-full h-full object-cover hover:scale-105 transition duration-300 cursor-pointer"
-            onClick={() => setSelectedImage(item.image)}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            No Image
-          </div>
+        <img
+          src={images[currentImageIndex]}
+          alt={item?.name}
+          className="w-full h-full object-cover hover:scale-105 transition duration-300 cursor-pointer"
+          onClick={() => setZoomImage(images[currentImageIndex])}
+        />
+
+        {hasMultipleImages && (
+          <button
+            onClick={handleNextImage}
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full w-8 h-8 flex justify-center items-center hover:bg-black/70"
+          >
+            <IoChevronForward size={18} />
+          </button>
         )}
 
+        {hasMultipleImages && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+            {images.map((_, index) => (
+              <span
+                key={index}
+                className={`w-2 h-2 rounded-full ${index === currentImageIndex
+                    ? "bg-white"
+                    : "bg-white/40"
+                  }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* ================= ZOOM IMAGE ================= */}
-      {selectedImage && (
+      {/* Zoom Image */}
+      {zoomImage && (
         <div
           className="fixed inset-0 bg-black/80 flex justify-center items-center z-50"
-          onClick={() => setSelectedImage(null)}
+          onClick={() => setZoomImage(null)}
         >
           <img
-            src={selectedImage}
+            src={zoomImage}
             alt="Preview"
             className="max-w-[90%] max-h-[90%] rounded-lg"
             onClick={(e) => e.stopPropagation()}
           />
 
           <button
-            type="button"
-            onClick={() => setSelectedImage(null)}
+            onClick={() => setZoomImage(null)}
             className="absolute top-5 right-5 text-white text-4xl"
           >
             <IoMdClose />
           </button>
         </div>
       )}
+
 
       {/* ================= CONTENT ================= */}
       <div className="p-3 flex flex-col flex-1">
