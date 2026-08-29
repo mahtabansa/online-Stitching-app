@@ -37,6 +37,7 @@ const Createorder = async (req, res) => {
     const shopOrders = await Promise.all(
       Object.entries(groupItemByShop).map(async ([shopId, items]) => {
         console.log("Finding shop with id:", shopId);
+
         const shop = await Shop.findById(shopId).populate("owner");
         console.log("shop:", shop);
 
@@ -81,18 +82,21 @@ const Createorder = async (req, res) => {
       .populate("shopOrder.shop")
       .populate("shopOrder.owner")
       .populate("shopOrder.shopOrderItems.item");
+      console.log(populatedOrder, "populatedOrder");
+    // sirf us shop ke owner ko notify karo jiska order hai
+    populatedOrder.shopOrder.forEach((shopOrder) => {
+      console.log("shopOrder",shopOrder);
+      const ownerId = shopOrder.owner._id.toString();
 
-    // ✅ Har shop ke owner ko bhi turant notify karo
-    populatedOrder.shopOrder.forEach((order) => {
-      const ownerId = order.owner._id.toString();
-
-      // ✅ Debug: check karo room me koi socket hai ya nahi
-      const room = getIO().sockets.adapter.rooms.get(`user_${ownerId}`);
-
-      getIO().to(`user_${ownerId}`).emit("newOrder", {
-        ownerId,
-        order: populatedOrder,
-      });
+      // // ✅ Debug: check karo room me koi socket hai ya nahi
+      // const room = getIO().sockets.adapter.rooms.get(`user_${ownerId}`);
+ 
+      getIO()
+        .to(`owner_${ownerId}`)
+        .emit("newOrder", {
+          ownerId,
+           order: populatedOrder,
+        });
     });
 
     return res
@@ -183,6 +187,14 @@ export const CancelOrder = async (req, res) => {
 
         await order.save();
       }
+      console.log("order in the cancel order", order);
+
+      console.log("order in the cancel order", order.shopOrder.owner);
+
+      getIO().to(`owner_${order.shopOrder.owner}`).emit("orderStatusUpdate", {
+        orderId: order._id,
+        status: order.status,
+      });
 
       res.json({
         success: true,
@@ -305,7 +317,6 @@ export const sendPickupOtp = async (req, res) => {
   }
 };
 
-
 // ================== STEP 4: Owner Verify Pickup OTP → status = stitching ==================
 export const verifyPickupOtp = async (req, res) => {
   try {
@@ -360,8 +371,8 @@ export const sendDeliveryOtp = async (req, res) => {
   try {
     const { orderId } = req.params;
     const order = await Order.findById(orderId);
-    if(!orderId) {
-         return res.status(404).json({ message: "OrderId is required" });
+    if (!orderId) {
+      return res.status(404).json({ message: "OrderId is required" });
     }
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -371,12 +382,10 @@ export const sendDeliveryOtp = async (req, res) => {
       order.status !== "stitching" &&
       order.status !== "out of delivery"
     ) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Order is not in delivery stage,please make order out of delivery first",
-        });
+      return res.status(400).json({
+        message:
+          "Order is not in delivery stage,please make order out of delivery first",
+      });
     }
 
     if (order.status === "stitching") {
@@ -396,7 +405,7 @@ export const sendDeliveryOtp = async (req, res) => {
       orderId: order._id,
       deliveryOtp: order.deliveryOtp, // agar security concern hai to ye field mat bhejo
       pickupOtpExpiry: order.pickupOtpExpiry,
-      status:order.status
+      status: order.status,
     });
 
     res.json({
@@ -434,13 +443,13 @@ export const verifyDeliveryOtp = async (req, res) => {
         message: "OTP expire ho gaya, dobara generate karo",
       });
     }
-    
+
     order.deliveryVerified = true;
     order.deliveredAt = Date.now();
     order.deliveryOtp = undefined;
     order.deliveryOtpExpiry = undefined;
-     await changeOrderStatus(order, "delivered", "Delivery OTP verified");
-  
+    await changeOrderStatus(order, "delivered", "Delivery OTP verified");
+
     await order.save();
 
     getIO().to(`user_${order.user}`).emit("verifyOtpConfirmation", {
