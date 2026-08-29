@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setRole } from "./redux/userSlice.js";
 const Choose = () => {
-  const userRole = useSelector((state) => state.user.role);
   const [showPopup, setShowPopup] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-
   const handleSelect = (role) => {
-    console.log("Selected Role:", role);
+
     dispatch(setRole(role));
     setShowPopup(false);
     navigate('/signup')

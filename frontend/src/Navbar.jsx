@@ -28,10 +28,6 @@ const Navbar = () => {
     }
   }
 
-  const checkToken = () => {
-    return !!document.cookie.split('; ').find(row => row.startsWith('token='));
-  };
-
   const handleSearch = async (query) => {
     if (controllerRef.current) controllerRef.current.abort();
     const controller = new AbortController();
@@ -148,7 +144,7 @@ const Navbar = () => {
                 <button className="font-medium cursor-pointer" style={{ display: userData ? 'none' : 'block' }} onClick={() => navigate('/login')}>Login</button>
             }
 
-            {userData && userData?.role === "tailor" ?
+            {userData && userData?.role === "tailor" ? 
               <div className='flex gap-5'>
                 <button className="bg-gray-500 text-white px-3 py-2 rounded-lg font-semibold cursor-pointer" onClick={() => navigate('/my-orders')}>
                   🛒 My Order
@@ -156,30 +152,41 @@ const Navbar = () => {
                 <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold cursor-pointer" onClick={() => navigate('/create-item')}>
                   Add Item
                 </button>
-                  
-                <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold cursor-pointer " onClick={() => { navigate('/setting'), setOpen(false) }}>
-                  Setting
+
+                <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold cursor-pointer " onClick={() => { navigate('/profile'), setOpen(false) }}>
+                  Account
                 </button>
-             
+
 
               </div> :
               <div className='flex justify-center gap-3'>
-                <div className='relaitve flex justify-center items-center align-items gap-3' >
+                <div className='flex justify-center items-center align-items gap-3' >
                   {
                     userData ? <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold gap-3 cursor-pointer " onClick={() => navigate('/my-orders')}>
                       My Order
                     </button> : null
-                  } 
+                  }
 
-                  <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold cursor-pointer" onClick={() => navigate('/my-cart')}>
-                    My cart
-                  </button>
-                  <span className='bg-[#baccbf] rounded-xl absolute w-[20px] h-[20px] text-black -top-2 -right-1 items-center '>{ItemCard?.length}</span>
+                  <div className='relaitve flex items-center justify-center '>
+                    <button className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold cursor-pointer" onClick={() => navigate('/my-cart')}>
+                      My cart
+                    </button>
+                    <span className='bg-[#baccbf] rounded-xl absolute w-[20px] h-[20px] text-black -top-2 -right-1 items-center pl-1'>{ItemCard?.length}</span>
+                  </div>
+
                 </div>
+
               </div>
+
             }
 
           </div>
+          {userData?.role === 'tailor' ? "" :
+            <button className="ml-3 bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold cursor-pointer hidden md:block lg:block xl:block" onClick={() => navigate('/profile')}>
+              Profile
+            </button>
+          }
+
 
 
           {/* for User Only */}
@@ -235,8 +242,8 @@ const Navbar = () => {
             <div className="flex flex-col p-4 space-y-3">
               <p className="cursor-pointer hover:text-gray-600 font-semibold " onClick={() => { navigate('/'), setOpen(false) }} >{userData ? userData?.name?.toUpperCase() : ""}</p>
               <div>
-                <button className="cursor-pointer hover:text-gray-600 font-semibold " onClick={() => { navigate('/setting'), setOpen(false) }}>
-                  Setting
+                <button className="cursor-pointer hover:text-gray-600 font-semibold " onClick={() => { navigate('/profile'), setOpen(false) }}>
+                  Profile
                 </button>
               </div>
 
@@ -259,7 +266,6 @@ const Navbar = () => {
 
 
       {userData && userData.role === "tailor" ? null : (
-
 
         <div className="md:hidden lg:hidden flex-2 mx-6 mb-4">
           <div className="flex items-center w-full bg-gray-200 rounded-lg overflow-hidden">
