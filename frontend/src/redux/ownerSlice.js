@@ -10,28 +10,28 @@ const ownerSlice = createSlice({
     setMyShopData: (state, actions) => {
       state.myShopData = actions.payload;
     },
-updateMyshopData: (state, action) => {
-  const { shopId, shop, created } = action.payload;
+    updateMyshopData: (state, action) => {
+      const { shopId, shop, created } = action.payload;
 
-  if (!shopId || !shop) return;
+      if (!shopId || !shop) return;
 
-  // agar myShopData abhi null/undefined hai, empty array bana do
-  if (!state.myShopData) {
-    state.myShopData = [];
-  }
+      // agar myShopData abhi null/undefined hai, empty array bana do
+      if (!state.myShopData) {
+        state.myShopData = [];
+      }
 
-  const index = state.myShopData.findIndex(
-    (s) => String(s._id) === String(shopId),
-  );
+      const index = state.myShopData.findIndex(
+        (s) => String(s._id) === String(shopId),
+      );
 
-  if (index !== -1) {
-    // existing shop -> update
-    state.myShopData[index] = { ...state.myShopData[index], ...shop };
-  } else {
-    // naya shop -> array mein push karo
-    state.myShopData.push(shop);
-  }
-},
+      if (index !== -1) {
+        // existing shop -> update
+        state.myShopData[index] = { ...state.myShopData[index], ...shop };
+      } else {
+        // naya shop -> array mein push karo
+        state.myShopData.push(shop);
+      }
+    },
     updateShopItem: (state, action) => {
       const { shopId, itemId, item } = action.payload;
 
@@ -98,8 +98,8 @@ updateMyshopData: (state, action) => {
       state.myShopData[shopIndex].items.unshift(Item);
     },
     deleteItem: (state, actions) => {
-      const { shopId,ItemId, Item } = actions.payload;
-      if (!shopId || !Item ,!ItemId) {
+      const { shopId, ItemId, Item } = actions.payload;
+      if ((!shopId || !Item, !ItemId)) {
         console.log("shopId or ItemId or item missing");
         return;
       }
@@ -117,14 +117,19 @@ updateMyshopData: (state, action) => {
         return;
       }
 
-     state.myShopData[shopIndex].items = 
-     state.myShopData[shopIndex].items.filter((i)=>String(i._id) !== String(ItemId));
-
+      state.myShopData[shopIndex].items = state.myShopData[
+        shopIndex
+      ].items.filter((i) => String(i._id) !== String(ItemId));
     },
   },
 });
-export const { setMyShopData, updateMyshopData, updateShopItem ,setNewItem,deleteItem} =
-  ownerSlice.actions;
+export const {
+  setMyShopData,
+  updateMyshopData,
+  updateShopItem,
+  setNewItem,
+  deleteItem,
+} = ownerSlice.actions;
 
 export const ownerReducer = ownerSlice.reducer;
 export default ownerSlice.reducer;

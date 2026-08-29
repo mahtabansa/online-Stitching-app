@@ -111,15 +111,6 @@ const userSlice = createSlice({
       );
     },
 
-    // AddMyOrders: (state, action) => {
-    //   console.log("Reducer Payload:", action.payload);
-    //   console.log("Before:", state.Myorder.orders);
-
-    //   state.Myorder.orders.unshift(action.payload);
-
-    //   console.log("After:", state.Myorder.orders);
-    // },
-
     SetMyOrders: (state, action) => {
       state.Myorder.orders = action.payload;
     },
@@ -141,6 +132,15 @@ const userSlice = createSlice({
         order.status = status;
       }
     },
+    cancelOrder: (state, action) => {
+      const { orderId ,status,cancelReason} = action.payload;
+      const order = state.Myorder.orders.find((o) => o._id === orderId);
+      if (order) {
+        order.status = status;
+        order.cancelReason = cancelReason;
+      }
+    },
+
     updatePickupTime: (state, action) => {
       const { orderId, pickupTime } = action.payload;
 
@@ -195,6 +195,7 @@ export const {
   clearCheckOut,
   updatePickupTime,
   updateProfileImage,
+  cancelOrder
 } = userSlice.actions;
 
 export const userReducer = userSlice.reducer;
