@@ -18,32 +18,6 @@ const HomePage = () => {
   return (
     <>
 
-      {/* Floating search results — sirf jab search active ho */}
-      {/* {isSearching && (
-        <div className="absolute top-[70px] left-0 right-0 z-50 bg-white shadow-lg max-h-[80vh] overflow-y-auto min-h-screen">
-
-          {searchResults.length > 0 ? (
-
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
-
-              {searchResults.map((item) => (
-                <div key={item._id} className="w-full min-w-0">
-                  <ProductCard item={item} />
-                </div>
-              ))}
-
-            </div>
-
-          ) : (
-            <p className="text-center py-6 text-gray-500">
-              No results found
-            </p>
-          )}
-
-        </div>
-      )} */}
-
-      {/* Normal page — isSearching true hone par blur/dim kar sakte hain */}
       <div className={isSearching ? 'pointer-events-none blur-sm ' : ''}>
         {userData?.role === 'tailor' ? (
           <>
@@ -58,8 +32,6 @@ const HomePage = () => {
             <Hero />
             <ExpertTailor />
             <HowWorks />
-
-
           </div>
         )}
       </div>
