@@ -4,6 +4,7 @@ import axios from 'axios'
 import { CgClose } from "react-icons/cg";
 import { useParams } from 'react-router-dom';
 import { useDispatch } from "react-redux";
+import { cancelOrder } from "../../redux/userSlice.js";
 
 const OrderCard = ({ order }) => {
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ const OrderCard = ({ order }) => {
   const [cancelReason, setCancelReason] = useState("");
   const [customReason, setCustomReason] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
-
 
   const reasons = [
     "Changed my mind",
@@ -38,14 +38,13 @@ const OrderCard = ({ order }) => {
     try {
       await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/order/cancel-order/${id}`, { cancelReason, customReason }, { withCredentials: true }).then(res => {
       })
+      dispatch(cancelOrder({ orderId: id, status: "cancelled", cancelReason }));
     } catch (err) {
       console.log(`error ocuured while cancelling user's order ${err}`)
     }
 
   };
-
-  ////this an incompelte due some isssues in place order
-
+   
 
   return (
     <div className="w-full max-w-md bg-white rounded-xl shadow-md p-4 mb-5">
@@ -58,10 +57,10 @@ const OrderCard = ({ order }) => {
             {/* Image */}
             <div className="w-32 h-42 flex-shrink-0">
               <img
-                src={orderItem.item?.image}
+                src={orderItem.item?.image[0]}
                 alt={orderItem.item?.name}
                 className="w-full h-full object-cover rounded-lg"
-                onClick={() => setSelectedImage(orderItem.item?.image)}
+                onClick={() => setSelectedImage(orderItem.item?.image[0])}
               />
             </div>
 
