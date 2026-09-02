@@ -1,11 +1,11 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios'
 import Loader from '../../pages/Loader.jsx';
-import { useEffect } from 'react';
+import { setAddress } from '../../redux/userSlice.js';
 const UpdateProfile = () => {
   const {userData} = useSelector((state) => state.user)
 
@@ -16,7 +16,7 @@ const UpdateProfile = () => {
   const [area, setArea] = useState(userData?.address?.area || "");
   const [city, setCity] = useState(userData?.address?.city || "");
   const [state, setState] = useState(userData?.address?.state || "");
-  
+  const dispatch = useDispatch()
  
   const [loader, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const handleSubmit = async (e) => {
 
   setLoading(true)
   try {
-    const res = await axios.post(
+    const response = await axios.post(
       `${import.meta.env.VITE_SERVER_URL}/api/user/update-profile`,
       formData,
       {
@@ -45,12 +45,14 @@ const handleSubmit = async (e) => {
       }
     );
 
-    console.log(res.data);
+    let res = response.data;
     setLoading(false)
     toast.success("updated successfully")
+    console.log("res?.user?.house",res?.user?.address?.house,res?.user?.address?.sector)
+    dispatch(setAddress({house:res?.user?.address?.house,sector:res?.user?.address?.sector,area:res?.user?.address?.area,state:res?.user?.address?.state,city:res?.user?.address?.city}));
     navigate('/profile')
   } catch (err) {
-    toast.error();
+    toast.error("Did not update");
     setLoading(false);
     console.log(err);
   }

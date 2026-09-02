@@ -1,13 +1,8 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { CiSearch } from "react-icons/ci";
-import { Link, useNavigate } from 'react-router-dom'
-import { ToastContainer, toast } from "react-toastify";
+import { Link } from 'react-router-dom'
+import { ToastContainer } from "react-toastify";
 import custom_design from '../../media/custom_design.png'
 import popularTailor from '../../media/popularTailor.png'
 const Home = () => {
-  const navigate = useNavigate();
-  const [username,setUsername] = useState();
   
   return (
 <>

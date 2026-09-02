@@ -45,7 +45,91 @@ const TailorDashboard = () => {
           : <ShopCard className="mt-5" data={myShopData[0]} />
         }
       </div>
+      <div className="p-3 sm:p-5 flex justify-center">
+        <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3 w-full sm:w-auto">
 
+          {/* All Orders */}
+          <button
+            className="
+        flex items-center justify-center gap-2
+        w-full sm:w-auto
+        px-3 py-3 sm:px-5 sm:py-2.5
+        rounded-xl
+        bg-blue-500 text-white
+        text-sm sm:text-base
+        font-medium
+        shadow-sm
+        hover:bg-blue-600
+        active:scale-95
+        transition-all duration-200
+      "
+          >
+            <i className="fa-solid fa-list-check"></i>
+            <span>All Orders</span>
+          </button>
+
+          {/* Pending */}
+          <button
+            className="
+        flex items-center justify-center gap-2
+        w-full sm:w-auto
+        px-3 py-3 sm:px-5 sm:py-2.5
+        rounded-xl
+        bg-yellow-500 text-white
+        text-sm sm:text-base
+        font-medium
+        shadow-sm
+        hover:bg-yellow-600
+        active:scale-95
+        transition-all duration-200
+      "
+          >
+            <i className="fa-solid fa-clock"></i>
+            <span>Pending</span>
+          </button>
+
+          {/* Completed */}
+          <button
+            className="
+        flex items-center justify-center gap-2
+        w-full sm:w-auto
+        px-3 py-3 sm:px-5 sm:py-2.5
+        rounded-xl
+        bg-green-500 text-white
+        text-sm sm:text-base
+        font-medium
+        shadow-sm
+        hover:bg-green-600
+        active:scale-95
+        transition-all duration-200
+      "
+          >
+            <i className="fa-solid fa-circle-check"></i>
+            <span>Completed</span>
+          </button>
+
+          {/* Cancelled */}
+          <button
+            className="
+        flex items-center justify-center gap-2
+        w-full sm:w-auto
+        px-3 py-3 sm:px-5 sm:py-2.5
+        rounded-xl
+        bg-red-500 text-white
+        text-sm sm:text-base
+        font-medium
+        shadow-sm
+        hover:bg-red-600
+        active:scale-95
+        transition-all duration-200
+      "
+          >
+            <i className="fa-solid fa-circle-xmark"></i>
+            <span>Cancelled</span>
+          </button>
+
+        </div>
+      </div>
       <div className='flex flex-wrap justify-center items-center mt-5 '>
         {
           userData && myShopData && myShopData[0]?.items?.length > 0 ? (

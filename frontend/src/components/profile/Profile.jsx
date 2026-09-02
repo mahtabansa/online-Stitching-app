@@ -3,8 +3,7 @@ import profileavtar from '../../assets/profileavtar.webp'
 import { FaRegEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 const ProfileSection = () => {
-  const { userData } = useSelector((state) => state.user);
-  console.log("userData", userData)
+  const userData = useSelector((state) => state.user);
   const Navigate = useNavigate();
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-md border border-gray-200 p-6 mt-4 relative">
@@ -28,8 +27,13 @@ const ProfileSection = () => {
           </h2>
 
           <p className="text-gray-500 mt-1">
-            {userData?.address?.city},{" "}
-            {userData?.address?.state}
+            {(userData?.address?.city || userData?.userData?.address?.city)
+              ?.toLowerCase()
+              .replace(/\b\w/g, (char) => char.toUpperCase())}
+            {", "}
+            {(userData?.address?.state || userData?.userData?.address?.state)
+              ?.toLowerCase()
+              .replace(/\b\w/g, (char) => char.toUpperCase())}
           </p>
         </div>
 
@@ -47,7 +51,7 @@ const ProfileSection = () => {
             City
           </p>
           <p className="text-base font-medium text-gray-800">
-            {userData?.address?.city}
+            {(userData?.address?.city || userData?.userData?.address?.city)?.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) || "City not available"}
           </p>
         </div>
 
@@ -57,7 +61,9 @@ const ProfileSection = () => {
             State
           </p>
           <p className="text-base font-medium text-gray-800">
-            {userData?.address?.state }
+            {(userData?.address?.state || userData?.userData?.address?.state)
+              ?.toLowerCase()
+              .replace(/\b\w/g, char => char.toUpperCase()) || "State not available"}
           </p>
         </div>
 
@@ -68,7 +74,8 @@ const ProfileSection = () => {
           </p>
 
           <p className="text-base font-medium text-gray-800 leading-relaxed">
-            {userData?.phone}
+            {userData?.phone || userData?.userData?.phone}
+
           </p>
         </div>
 
@@ -79,11 +86,9 @@ const ProfileSection = () => {
           </p>
 
           <p className="text-base font-medium text-gray-800 leading-relaxed">
-            {userData?.address
-              ? Object.values(userData.address)
-                .filter(Boolean)
-                .join(", ")
-              : "Address not available"}
+            {Object.values(userData?.userData?.address || {})
+              .filter(Boolean)
+              .join(", ") || "Address not available"}
           </p>
         </div>
 

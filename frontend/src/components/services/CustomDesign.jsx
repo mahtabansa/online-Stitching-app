@@ -7,8 +7,9 @@ import Loader from '../../pages/Loader.jsx'
 
 const CustomDesign = () => {
   const navigate = useNavigate();
-  const { ItemsInMyCity ,itemsLoading} = useSelector((state) => state.user);
-
+  const { ItemsInMyCity ,itemsLoading,allItems} = useSelector((state) => state.user);
+  const items =  ItemsInMyCity?.length > 0 ? ItemsInMyCity : allItems;
+ 
   return (
     <>
       <div className='flex-1 p-5'>
@@ -36,9 +37,9 @@ const CustomDesign = () => {
             <div className="w-full flex justify-center items-center">
               <Loader />
             </div>
-          ) : ItemsInMyCity?.length > 0 ? (
-            ItemsInMyCity.map((shop) => (
-              <UserItemCard key={shop._id} item={shop} />
+          ) : items ?  (
+            items?.map((item) => (
+              <UserItemCard key={item._id} item={item} />
             ))
           ) : (
             <div className="col-span-full">

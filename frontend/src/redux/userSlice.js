@@ -1,13 +1,19 @@
-import { createSlice, configureStore } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const userSlice = createSlice({
   name: "user",
   initialState: {
     userData: null,
     role: null,
-    currentState: null,
-    currentCity: null,
-    currentAddress: null,
+    address: {
+      house: null,
+      sector: null,
+      area: null,
+      city: null,
+      state: null,
+    },
+    allItems:[],
+    allShops:[],
     shopsInMyCity: null,
     ItemsInMyCity: null,
     itemsLoading: false,
@@ -28,16 +34,16 @@ const userSlice = createSlice({
     ClearUser: (state) => {
       state.userData = null;
     },
-    setCurrentState: (state, actions) => {
-      state.currentState = actions.payload;
+    // setCurrentState: (state, actions) => {
+    //   state.currentState = actions.payload;
+    // },
+    setAddress: (state, action) => {
+       state.address.state = action.payload.state;
+      state.address.city = action.payload.city;
+      state.address.area =action.payload.area;
+      state.address.sector=action.payload.sector;
+       state.address.house = action.payload.house;
     },
-    setCurrentCity: (state, actions) => {
-      state.currentCity = actions.payload;
-    },
-    setCurrentAddress: (state, actions) => {
-      state.currentAddress = actions.payload;
-    },
-
     setCurrentLocation: (state, actions) => {
       state.location = actions.payload;
     },
@@ -49,6 +55,12 @@ const userSlice = createSlice({
     },
     setItemsInMyCity: (state, actions) => {
       state.ItemsInMyCity = actions.payload;
+    },
+    setAllItems: (state, actions) => {
+      state.allItems = actions.payload;
+    },
+    setAllShops: (state, actions) => {
+      state.allShops = actions.payload;
     },
     setAddToCard: (state, action) => {
       const newItem = action.payload;
@@ -133,7 +145,7 @@ const userSlice = createSlice({
       }
     },
     cancelOrder: (state, action) => {
-      const { orderId ,status,cancelReason} = action.payload;
+      const { orderId, status, cancelReason } = action.payload;
       const order = state.Myorder.orders.find((o) => o._id === orderId);
       if (order) {
         order.status = status;
@@ -167,20 +179,21 @@ const userSlice = createSlice({
         console.log(`user id mismatch`);
       }
     },
-    setItemsLoading:(state,actions)=>{
-      state.itemsLoading = actions.payload
-    }
+    setItemsLoading: (state, actions) => {
+      state.itemsLoading = actions.payload;
+    },
   },
 });
 export const {
   setUserData,
   setRole,
-  setCurrentCity,
-  setCurrentState,
-  setCurrentAddress,
+   setAddress,
+  // setCurrentAddress,
   setCurrentLocation,
   setShopsInMyCity,
   setItemsInMyCity,
+  setAllItems,
+  setAllShops,
   setItemsLoading,
   setAddToCard,
   updateQuantity,
@@ -195,7 +208,7 @@ export const {
   clearCheckOut,
   updatePickupTime,
   updateProfileImage,
-  cancelOrder
+  cancelOrder,
 } = userSlice.actions;
 
 export const userReducer = userSlice.reducer;

@@ -29,6 +29,8 @@ import Footer from './Footer.jsx'
 import { useEffect } from 'react';
 import Profile from './components/profile/Profile.jsx';
 import UpdateProfile from './components/profile/UpdateProfile.jsx';
+import FetchAllItem from './Hooks/FetchAllItem.jsx';
+import FetchAllshops from './Hooks/FetchAllshops.jsx';
 
 function App() {
   const { userData, role, isSearching, searchResults } = useSelector((state) => state.user);
@@ -46,6 +48,8 @@ function App() {
   GetShopInmyCity();
   GetItemsInMyCity();
   GetMyOrder();
+  FetchAllItem();
+  FetchAllshops();
 
   useEffect(() => {
     if (userData?._id) {

@@ -222,3 +222,8 @@ export const searchItem = async (req, res) => {
     });
   }
 };
+
+export const fetchAllItems = async(req,res)=>{
+  const items = await Item.find();
+  res.status(200).json(items)
+}

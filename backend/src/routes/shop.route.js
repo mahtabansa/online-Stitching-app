@@ -1,6 +1,6 @@
 import express from "express";
 import { authentication } from "../middleware/Authmiddleware.js";
-import { createEditShop ,getMyShop,getShopsInMyCity} from "../controllers/shop.controller.js";
+import { createEditShop ,getMyShop,getShopsInMyCity,fetchAllshops} from "../controllers/shop.controller.js";
 import multer from "multer";
 const upload = multer({ dest: "./public" });    
 
@@ -11,5 +11,6 @@ shopRouter.post("/create-edit-shop",authentication ,upload.single("image"),creat
 shopRouter.get("/my-shop",authentication ,getMyShop);
 
 shopRouter.get("/shops-in-my-city/:city" ,getShopsInMyCity);
+shopRouter.get("/all-shops" ,fetchAllshops);
 
 export {shopRouter}

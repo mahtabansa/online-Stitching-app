@@ -7,22 +7,18 @@ import { CiLocationOn } from "react-icons/ci";
 import { IoSearchOutline } from "react-icons/io5";
 import { BiCurrentLocation } from "react-icons/bi";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { IoPhonePortraitOutline } from "react-icons/io5";
-import { FiCreditCard } from "react-icons/fi";
 import { BsBoxSeam } from "react-icons/bs";
 import 'leaflet/dist/leaflet.css';
-import Navbar from '../../Navbar.jsx';
 import { setLocation, setAddress } from '../../redux/mapSlice.js';
-import { setCurrentLocation, AddMyOrders } from '../../redux/userSlice.js';
+import { setCurrentLocation, AddMyOrders, clearCheckOut } from '../../redux/userSlice.js';
 import { FaScissors } from "react-icons/fa6";
 import ChekOutItemCard from '../Tailor Cards/ChekOutItemCard.jsx';
-import { setCheckOut, ClearUser,clearCheckOut } from '../../redux/userSlice.js';
 
 
 function RecenterMap({ location }) {
-      if (location.lat || location.log) {
+      if (location?.lat || location?.log) {
             const map = useMap();
-            map.setView([location.lat, location.log], map.getZoom(), { animate: true });
+            map.setView([location?.lat, location?.log], map.getZoom(), { animate: true });
       }
 }
 
@@ -30,10 +26,23 @@ const CheckOut = () => {
       const navigate = useNavigate();
       const dispatch = useDispatch();
       const { address } = useSelector(state => state.map);
-      const { TotalAmount, CheckOutItem, Myorder, userData, location, currentAddress } = useSelector(state => state.user);
+      const { TotalAmount, CheckOutItem, Myorder, userData, location } = useSelector(state => state.user);
+
+      const currentAddress =   address? userData?.address : {};
+
+      const fullAddress = [
+            currentAddress?.house,
+            currentAddress?.sector,
+            currentAddress?.area,
+            currentAddress?.city,
+            currentAddress?.state,
+      ]
+            .filter(Boolean)
+            .join(", ");
 
       const apikey = import.meta.env.VITE_GEOCODING_APIKEY;
-      const [addressInput, setAddressInput] = useState(address || currentAddress || "");
+      const [addressInput, setAddressInput] = useState(fullAddress);
+
       const [StitchingMethod, setStitchingMethod] = useState("tailor");
       const url = import.meta.env.VITE_SERVER_URL;
 
@@ -41,8 +50,8 @@ const CheckOut = () => {
 
       const ondragend = (e) => {
             const marker = e.target;
-            const lat = marker._latlng.lat;
-            const lon = marker._latlng.lng;
+            const lat = marker?._latlng.lat;
+            const lon = marker?._latlng.lng;
             dispatch(setCurrentLocation({ latitude: lat, longitude: lon }))
             dispatch(setLocation({ latitude: lat, longitude: lon }));
             getaddressByLatLog(lat, lon)
@@ -50,8 +59,8 @@ const CheckOut = () => {
 
       const getCurrentLocation = () => {
             console.log("location", location)
-            const lat = location.latitude;
-            const lon = location.longitude;
+            const lat = location?.latitude;
+            const lon = location?.longitude;
             dispatch(setLocation({ latitude: lat, longitude: lon }));
             getaddressByLatLog(lat, lon) // ye call karega current address ke liye 
 
@@ -107,7 +116,7 @@ const CheckOut = () => {
 
       const handleBack = () => {
             dispatch(clearCheckOut(null))
-             window.history.back(-1);
+            window.history.back(-1);
 
       }
       const handlePlaceOrder = async () => {
@@ -117,8 +126,8 @@ const CheckOut = () => {
                   CheckOutItem,
                   totalAmount: TotalAmount + deliveryfees,
                   deliveryAddress: addressInput,
-                  loggitude: location.loggitude,
-                  latitude: location.latitude,
+                  longitude: location?.longitude,
+                  latitude: location?.latitude,
                   StitchingMethod,
 
             }, { withCredentials: true })
@@ -150,8 +159,6 @@ const CheckOut = () => {
 
       return (
             <>
-
-
                   <div className='min-h-screen bg-[#fff9f6] flex items-center justify-center relative '>
 
                         <div className='flex absolute top-5 left-5 '>
@@ -180,14 +187,14 @@ const CheckOut = () => {
                               <div className='sticky rounded-lg bg-gray-100 p-4 m-4  '>
                                     <div className='h-60 w-full '>
 
-                                          <MapContainer center={[location.lat || 51.505, location.log || -0.09]} zoom={13} scrollWheelZoom={true} className="h-full w-full rounded-lg map-container">
+                                          <MapContainer center={[location?.lat || 51.505, location?.longitude || -0.09]} zoom={13} scrollWheelZoom={true} className="h-full w-full rounded-lg map-container">
 
                                                 <TileLayer
                                                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                                 />
                                                 <RecenterMap location={location} />
-                                                <Marker position={[location.latitude, location.longitude]} draggable={true} eventHandlers={{ dragend: ondragend }}>
+                                                <Marker position={[location?.latitude, location?.longitude]} draggable={true} eventHandlers={{ dragend: ondragend }}>
                                                       <Popup >
                                                             Give exact location for. <br /> fastest delivery
                                                       </Popup>

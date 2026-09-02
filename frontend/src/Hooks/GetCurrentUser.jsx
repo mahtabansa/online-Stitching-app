@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 import { useEffect } from 'react'
 import { setUserData ,ClearUser } from '../redux/userSlice.js'
 import { useDispatch, useSelector } from 'react-redux'
-import { io } from 'socket.io-client'
 const serverurl = import.meta.env.VITE_SERVER_URL;
 
 
@@ -13,7 +12,7 @@ const GetCurrentUser = () => {
    const [loading,setLoading] = useState(false);
    const dispatch = useDispatch();
   useEffect(() => {
-   
+     if(userData) return;
     const fetchUser = async () => {
       try {
         const result = await axios.get(
@@ -32,7 +31,7 @@ const GetCurrentUser = () => {
    
 
     fetchUser();
-  }, [!userData]);
+  }, []);
 
   return loading;
 

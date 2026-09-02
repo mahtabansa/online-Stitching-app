@@ -7,15 +7,16 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import { CiSearch } from "react-icons/ci";
 import { RxCross2 } from "react-icons/rx";
 
-
 const Navbar = () => {
-  const { userData, currentCity, currentState, ItemCard, searchResults } = useSelector((state) => state.user);
+  const { userData, address, ItemCard, searchResults } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [SearchedItem, setSearchItem] = useState("");
 
   const controllerRef = useRef(null);
+  const currentCity = address?.city || userData?.address?.city;
+  const currentState = address?.state || userData?.address?.state;
 
   const handleLogout = async () => {
     try {
@@ -94,15 +95,16 @@ const Navbar = () => {
     <nav className="bg-white shadow sticky top-0 z-50 ">
       <div className="max-w-6xl mx-auto px-4" >
         <div className={`flex items-center h-16 ${userData?.role === "tailor" ? "justify-between gap-5" : "justify-between"} `} >
-          {/* This is side Tailor Name */}
+          {/* This show Tailor Name */}
           <div className="flex items-center  gap-4">
+
             <h1 className="text-3xl md:text-4xl font-bold text-[#111111]">
               <Link to='/'> <span className='opacity-75'>T</span><span className="text-[#B07A5A]">ailor</span></Link>
             </h1>
-
+             
             <div className="hidden lg:flex flex-col justify-center text-sm px-3">
               <span className="font-semibold">Tailor near by me</span>
-              <span className="text-gray-500 py-1">{currentCity}, {currentState}</span>
+              <span className="text-gray-500 py-1">{currentCity || userData?.userData?.address?.city}, {currentState|| userData?.userData?.address?.state}</span>
             </div>
           </div>
 
@@ -144,7 +146,7 @@ const Navbar = () => {
                 <button className="font-medium cursor-pointer" style={{ display: userData ? 'none' : 'block' }} onClick={() => navigate('/login')}>Login</button>
             }
 
-            {userData && userData?.role === "tailor" ? 
+            {userData && userData?.role === "tailor" ?
               <div className='flex gap-5'>
                 <button className="bg-gray-500 text-white px-3 py-2 rounded-lg font-semibold cursor-pointer" onClick={() => navigate('/my-orders')}>
                   🛒 My Order

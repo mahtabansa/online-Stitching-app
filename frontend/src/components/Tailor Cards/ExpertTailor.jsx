@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import dummy_pic from '../../assets/dummy_pic.jpg'
+import profileavtar from '../../assets/profileavtar.webp'
 import { useSelector } from 'react-redux'
 
 const ExpertTailor = () => {
-  const { shopsInMyCity } = useSelector((state) => state.user || {})
-  const shops = shopsInMyCity?.shop || []
-
+  const { shopsInMyCity ,allShops} = useSelector((state) => state.user || {})
+  const shops =   shopsInMyCity?.shop || allShops;
+  
   const getBatchSize = () => {
     const width = window.innerWidth
     if (width >= 1024) return 12 // lg (6 columns × 2 rows)
@@ -37,7 +37,7 @@ const ExpertTailor = () => {
     setVisibleCount(batchSize)
   }, [shops, batchSize])
 
-  const visibleShops = shops.slice(0, visibleCount)
+  const visibleShops = shops?.slice(0, visibleCount)
 
   return (
     <div className='bg-[#FEFEFE] rounded-xl'>
@@ -60,10 +60,10 @@ const ExpertTailor = () => {
                 <div className="rounded-full p-[3px] bg-gradient-to-tr from-gray-500 to-gray-600 shadow-md transition-transform duration-300 group-hover:scale-105">
                   <div className="rounded-full bg-white p-[2px]">
                     <img
-                      src={shop?.owner?.image || dummy_pic}
+                      src={shop?.owner?.image || profileavtar}
                       onError={(e) => {
                         e.target.onerror = null
-                        e.target.src = dummy_pic
+                        e.target.src = profileavtar
                       }}
                       alt={shop?.owner?.name || "Tailor"}
                       loading="lazy"
@@ -76,9 +76,9 @@ const ExpertTailor = () => {
                   {shop?.name || "Tailor Shop"}
                 </p>
 
-                {shop.rating && (
+                {shop?.rating && (
                   <span className="text-xs text-yellow-500 font-semibold">
-                    ⭐ {shop.rating}
+                    ⭐ {shop?.rating}
                   </span>
                 )}
               </div>

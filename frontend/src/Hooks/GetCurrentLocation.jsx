@@ -1,44 +1,128 @@
-import axios from 'axios';
-import React, { use, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { setCurrentAddress, setCurrentCity, setCurrentState, setCurrentLocation } from '../redux/userSlice.js';
-
-
+import axios from "axios";
+import React, { useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { setCurrentLocation, setAddress } from "../redux/userSlice.js";
 
 const GetCurrentLocation = () => {
-      const apikey = import.meta.env.VITE_GEOCODING_APIKEY;
-      const { userData } = useSelector(state => state.user);
-      const dispatch = useDispatch();
+  const apikey = import.meta.env.VITE_GEOCODING_APIKEY;
 
-      useEffect(() => {
+  const dispatch = useDispatch();
 
-           
-            if (navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition(async (position) => {
-                        const locationData = {
-                              latitude: position.coords.latitude,
-                              longitude: position.coords.longitude,
-                        }
-                        dispatch(setCurrentLocation(locationData));
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
+  // Last location where API was called
+  const lastApiLocation = useRef(null);
 
-                        const response = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&type=postcode&format=json&apiKey=${apikey}`);
-                       
-                        const result =response.data.results[0].city ? response.data.results[0].city : response.data.results[0].county;
-                        
-                        const fullAddress = response.data.results[0].address_line2 + " " + response.data.results[0].address_line1 + " " + " " + response.data.results[0].state + " " + response.data.results[0].country
-                        dispatch(setCurrentCity(result));
-                        dispatch(setCurrentAddress(fullAddress));
-                        dispatch(setCurrentState(response.data.results[0].state))
+  // Calculate distance between two locations
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371000; // Earth radius in meters
 
-                  })
-                  return
-            } else {
-                  console.log('Geolocation is not supported by this browser.')
-            }
-      })
-      return null
-}
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
 
-export default GetCurrentLocation
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  };
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      console.log("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    const watchId = navigator.geolocation.watchPosition(
+      async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+
+        const currentLocation = {
+          latitude,
+          longitude,
+        };
+        console.log("Current Location:", currentLocation);
+
+        // Redux me current location update
+        dispatch(setCurrentLocation(currentLocation));
+
+        // First location -> API call
+        if (!lastApiLocation.current) {
+          lastApiLocation.current = currentLocation;
+
+          await getAddress(latitude, longitude);
+
+          return;
+        }
+
+        // Distance from last API call location
+        const distance = getDistance(
+          lastApiLocation.current.latitude,
+          lastApiLocation.current.longitude,
+          latitude,
+          longitude
+        );
+
+        console.log("Distance moved:", distance.toFixed(2), "meters");
+
+        // Only API call when distance >= 100 meters
+        if (distance >= 100) {
+          console.log("Moved more than 100 meters. Calling API...");
+
+          lastApiLocation.current = currentLocation;
+
+          await getAddress(latitude, longitude);
+        }
+      },
+      (error) => {
+        console.log("Location error:", error);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 10000,
+      }
+    );
+
+    // Cleanup
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, []);
+
+  const getAddress = async (latitude, longitude) => {
+    try {
+      const response = await axios.get(
+        `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&type=postcode&format=json&apiKey=${apikey}`
+      );
+
+      const result =
+        response.data.results[0]?.city ||
+        response.data.results[0]?.county;
+
+      const state = response.data.results[0]?.state;
+
+      dispatch(
+        setAddress({
+          city: result,
+          state: state,
+        })
+      );
+
+      // console.log("API called");
+      // console.log("City:", result);
+      // console.log("State:", state);
+    } catch (error) {
+      console.log("Geocoding error:", error);
+    }
+  };
+
+  return null;
+};
+
+export default GetCurrentLocation;

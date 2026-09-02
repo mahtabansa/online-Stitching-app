@@ -93,3 +93,8 @@ const getShopsInMyCity = async (req, res) => {
 };
 
 export { getShopsInMyCity };
+
+export const fetchAllshops = async(req,res)=>{
+  const shops = await Shop.find().populate("items owner");
+  res.status(200).json(shops)
+}

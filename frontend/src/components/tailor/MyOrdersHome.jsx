@@ -22,7 +22,6 @@ const MyOrdersHome = () => {
             socket.on("newOrder", (data) => {
                   console.log("New order received:", data.order);
                   dispatch(AddMyOrders(data.order))
-
             });
 
             socket.on("placeOrder", (data) => {
@@ -63,14 +62,13 @@ const MyOrdersHome = () => {
             };
       }, [dispatch]);
 
-
-
       return (
             <>
                   <div className='p-5 flex justify-center flex-row gap-5' >
                         <button className='text-gray-700 text-2xl' onClick={() => navigate("/")}><FaArrowLeft /></button>
                         <h1 className='text-2xl font-semibold text-gray-700'>My Orders </h1>
                   </div>
+                
                   <div className=' flex flex-col items-center h-full gap-5'>
 
                         {Myorder?.orders?.length === 0 ?

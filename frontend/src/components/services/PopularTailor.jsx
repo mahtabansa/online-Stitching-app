@@ -7,8 +7,9 @@ import { useSelector } from 'react-redux';
 import PopularTailorCard from './PopularTailorCard.jsx';
 const PopularTailor = () => {
   const navigate = useNavigate();
-  const shopData = useSelector((state) => state.user.shopsInMyCity) || [];
-  const [selectedImage,setSelectedImage]=useState(null)
+  const {shopsInMyCity,allShops} = useSelector((state) => state.user) || [];
+
+  const shopData = shopsInMyCity?.shop?.length > 0 ? shopsInMyCity?.shop : allShops;
 
   return (
     <>
@@ -33,7 +34,7 @@ const PopularTailor = () => {
         <div className="flex flex-col justify-center items-center gap-6">
 
           {
-            shopData && shopData?.shop?.map((shop) => (
+            shopData && shopData?.map((shop) => (
               <PopularTailorCard key={shop._id} shop={shop} />
             ))
           }

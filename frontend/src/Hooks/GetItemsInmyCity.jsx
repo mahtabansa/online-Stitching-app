@@ -7,28 +7,28 @@ import {
 } from "../redux/userSlice";
 
 const GetItemsInMyCity = () => {
-  const { currentCity, userData, shopsInMyCity ,itemsInMyCity} = useSelector(
+  const { address, userData, itemsInMyCity} = useSelector(
     (state) => state.user
   );
+  let city = address.length > 0 ? address?.city : userData?.address?.city;
+  let city2 = address?.city;
+  city = city2;
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (
-      !currentCity ||
+      !city || !city2 ||
       userData?.role === "tailor" ||
-     
       itemsInMyCity?.length > 0
-    ) {
-      return;
-    }
+    ) return;
 
     const fetchItems = async () => {
       dispatch(setItemsLoading(true));
 
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_SERVER_URL}/api/items/get-items-incity/${currentCity}`,
+          `${import.meta.env.VITE_SERVER_URL}/api/items/get-items-incity/${city}`,
           {
             withCredentials: true,
           }
@@ -43,7 +43,7 @@ const GetItemsInMyCity = () => {
     };
 
     fetchItems();
-  }, [currentCity, itemsInMyCity, userData, dispatch]);
+  }, [ city2 ,itemsInMyCity, userData, dispatch]);
 
   return null;
 };

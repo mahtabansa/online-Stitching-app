@@ -62,19 +62,19 @@ const HowWorks = () => {
         </p>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-          {steps.map((step, index) => (
+          {steps?.map((step, index) => (
             <div
               key={index}
               className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6"
             >
               <div className="w-14 h-14 rounded-full bg-[#C7843B] text-white flex items-center justify-center">
-                {step.icon}
+                {step?.icon}
               </div>
 
-              <h2 className="text-xl font-semibold mt-5">{step.title}</h2>
+              <h2 className="text-xl font-semibold mt-5">{step?.title}</h2>
 
               <p className="text-gray-600 mt-3 leading-7">
-                {step.description}
+                {step?.description}
               </p>
             </div>
           ))}
